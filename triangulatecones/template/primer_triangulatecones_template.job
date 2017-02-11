@@ -1,16 +1,16 @@
 #!/bin/bash
 
 #Job name
-#SBATCH -J "primer_orientifold_template"
+#SBATCH -J "primer_triangulatecones_template"
 #################
 #Working directory
-#SBATCH -D "/gss_gpfs_scratch/altman.ro/modules/orientifold/template"
+#SBATCH -D "/gss_gpfs_scratch/altman.ro/modules/triangulatecones/template"
 #################
 #Job output file
-#SBATCH -o "primer_orientifold_template.out"
+#SBATCH -o "primer_triangulatecones_template.out"
 #################
 #Job error file
-#SBATCH -e "primer_orientifold_template.err"
+#SBATCH -e "primer_triangulatecones_template.err"
 #################
 #Job file write mode
 #SBATCH --open-mode="append"
@@ -34,7 +34,7 @@ h11="template"
 username="altman.ro"
 
 #Input primer info
-modname="orientifold"
+modname="triangulatecones"
 primername="${h11}"
 primerpartition="ser-par-10g"
 partitions="ser-par-10g,ser-par-10g-2,ser-par-10g-3,ser-par-10g-4"
@@ -56,9 +56,9 @@ scriptmemorylimit="1000000000"
 
 #Input database info
 mongouri="mongodb://manager:toric@129.10.135.170:27017/ToricCY"
-queries="[['POLY',{'H11':${h11},'FAV':True},{'POLYID':1,'H11':1,'H21':1,'DRESVERTS':1,'RESCWS':1,'BASIS':1}],['TRIANG',{'H11':${h11}},{'GEOMN':1,'TRIANGN':1,'SRIDEAL':1}],['INVOL',{'H11':${h11},'INVOL':{'\$exists':True,'\$ne':None}},{'INVOLN':1,'INVOL':1}]]"
-basecollection="INVOL"
-nthreads=""
+queries="[['POLY1',{'H11':${h11}},{'POLYID':1,'H11':1,'H21':1,'NVERTS':1,'NNVERTS':1}]]"
+basecollection="POLY1"
+nthreads="NNVERTS"
 
 #Options
 dbpushq="True"

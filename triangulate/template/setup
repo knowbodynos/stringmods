@@ -1,7 +1,7 @@
 #!/bin/bash
 
 mainpath="/gss_gpfs_scratch/altman.ro"
-herepath="${mainpath}/modules/orientifold/template"
+herepath="${mainpath}/modules/triangulate/template"
 toriccypath="${mainpath}/ToricCY/packages/python/toriccy"
 
 djob 2>/dev/null
