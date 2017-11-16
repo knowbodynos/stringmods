@@ -1,0 +1,25 @@
+#!/bin/bash
+
+currpath=$(pwd)
+
+#Install TOPCOM
+if [ "$(command -v points2ntriangs)" == "" ]
+then
+    cd ${HOME}
+    wget http://www.rambau.wm.uni-bayreuth.de/Software/TOPCOM-0.17.8.tar.gz
+    wait
+    tar xzfv TOPCOM-0.17.8.tar.gz
+    wait
+    rm TOPCOM-0.17.8.tar.gz
+    cd topcom-0.17.8
+    ./configure --prefix=${USER_LOCAL}
+    wait
+    make
+    wait
+    make install
+    wait
+    cd ..
+    rm -r topcom-0.17.8
+fi
+
+cd ${currpath}

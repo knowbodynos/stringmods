@@ -1,0 +1,18 @@
+#!/bin/bash
+
+currpath=$(pwd)
+
+#Install Macaulay2
+if [ "$(command -v M2)" == "" ]
+then
+    cd ${HOME}
+    wget http://www2.macaulay2.com/Macaulay2/Downloads/GNU-Linux/Generic/Macaulay2-1.6-x86_64-Linux-Generic.tar.gz
+    wget http://www2.macaulay2.com/Macaulay2/Downloads/Common/Macaulay2-1.6-common.tar.gz
+    wait
+    tar xzfv Macaulay2-1.6-x86_64-Linux-Generic.tar.gz --strip-components 1 --directory ${USER_LOCAL}/
+    tar xzfv Macaulay2-1.6-common.tar.gz --strip-components 1 --directory ${USER_LOCAL}/
+    wait
+    rm Macaulay2*.tar.gz
+fi
+
+cd ${currpath}

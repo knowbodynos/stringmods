@@ -1,0 +1,14 @@
+#!/bin/bash
+
+currpath=$(pwd)
+
+#Install jq
+if [ "$(command -v jq)" == "" ]
+then
+    cd ${USER_LOCAL}/bin
+    wget http://stedolan.github.io/jq/download/linux64/jq
+    wait
+    chmod +x jq
+fi
+
+cd ${currpath}

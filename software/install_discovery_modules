@@ -1,0 +1,48 @@
+#!/bin/bash
+
+rm ${HOME}/.newbashrc 2>/dev/null
+firstline=true
+prevline=""
+while IFS=$'\n' read -r line
+do
+    if ! ${firstline} && [[ "${prevline}" == "" ]] && ! [[ "${line}" =~ .*"# DBCrunch modules".* ]] && ! [[ "${line}" =~ .*"# Sage environment variables".* ]]
+    then
+        printf '%s\n' "${prevline}" >> ${HOME}/.newbashrc
+    fi
+
+    if [[ "${line}" != "" ]] && ! [[ "${line}" =~ .*"# DBCrunch modules".* ]] && ! [[ "${line}" =~ .*"# Sage environment variables".* ]] && ! [[ "${line}" =~ .*"module load gnu-4.4-compilers".* ]] && ! [[ "${line}" =~ .*"module load fftw-3.3.3".* ]] && ! [[ "${line}" =~ .*"module load platform-mpi".* ]] && ! [[ "${line}" =~ .*"module load perl-5.20.0".* ]] && ! [[ "${line}" =~ .*"module load slurm-14.11.8".* ]] && ! [[ "${line}" =~ .*"module load gnu-4.8.1-compilers".* ]] && ! [[ "${line}" =~ .*"module load boost-1.55.0".* ]] && ! [[ "${line}" =~ .*"module load python-2.7.5".* ]] && ! [[ "${line}" =~ .*"module load oracle_java_1.7u40".* ]] && ! [[ "${line}" =~ .*"module load hadoop-2.4.1".* ]] && ! [[ "${line}" =~ .*"module load mathematica-10".* ]] && ! [[ "${line}" =~ .*"module load cuda-7.0".* ]] && ! [[ "${line}" =~ .*"module load sage-7.4".* ]] && ! [[ "${line}" =~ .*"export SAGE_ROOT".* ]]
+    then
+        printf '%s\n' "${line}" >> ${HOME}/.newbashrc
+    fi
+    firstline=false
+    prevline=${line}
+done < ${HOME}/.bashrc
+
+echo "" >> ${HOME}/.newbashrc
+echo "# DBCrunch modules" >> ${HOME}/.newbashrc
+echo "module load gnu-4.4-compilers " >> ${HOME}/.newbashrc
+echo "module load fftw-3.3.3" >> ${HOME}/.newbashrc
+echo "module load platform-mpi" >> ${HOME}/.newbashrc
+echo "module load perl-5.20.0" >> ${HOME}/.newbashrc
+echo "module load slurm-14.11.8" >> ${HOME}/.newbashrc
+echo "module load gnu-4.8.1-compilers" >> ${HOME}/.newbashrc
+echo "module load boost-1.55.0" >> ${HOME}/.newbashrc
+echo "module load python-2.7.5" >> ${HOME}/.newbashrc
+echo "module load oracle_java_1.7u40" >> ${HOME}/.newbashrc
+echo "module load hadoop-2.4.1" >> ${HOME}/.newbashrc
+echo "module load mathematica-10" >> ${HOME}/.newbashrc
+echo "module load cuda-7.0" >> ${HOME}/.newbashrc
+echo "module load sage-7.4" >> ${HOME}/.newbashrc
+echo "" >> ${HOME}/.newbashrc
+echo "# Sage environment variables" >> ${HOME}/.newbashrc
+echo "#export SAGE_ROOT=/shared/apps/sage/sage-5.12" >> ${HOME}/.newbashrc
+echo "export SAGE_ROOT=/shared/apps/sage-7.4" >> ${HOME}/.newbashrc
+
+mv ${HOME}/.bashrc ${HOME}/.oldbashrc
+mv ${HOME}/.newbashrc ${HOME}/.bashrc
+
+wait
+
+source ${HOME}/.bashrc
+
+wait
