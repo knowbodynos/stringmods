@@ -1,7 +1,7 @@
 Credits
 =======
   - cypoly
-    * [Jonathan Carifio]:<br/>
+    * [Jonathan Carifio]():<br/>
       Original Author
     * [Ross Altman](http://github.com/knowbodynos):<br/>
       Contributor
@@ -39,7 +39,7 @@ Credits
       Original Author
 
   - gaugegroups
-    * [Jonathan Carifio]:<br/>
+    * [Jonathan Carifio]():<br/>
       Original Author
     * [Ross Altman](http://github.com/knowbodynos):<br/>
       Contributor
@@ -77,13 +77,13 @@ Credits
       Original Author
 
   - orientifold
-    * [Jonathan Carifio]:<br/>
+    * [Jonathan Carifio]():<br/>
       Original Author
     * [Ross Altman](http://github.com/knowbodynos):<br/>
       Contributor
 
   - orientifold1
-    * [Jonathan Carifio]:<br/>
+    * [Jonathan Carifio]():<br/>
       Original Author
     * [Ross Altman](http://github.com/knowbodynos):<br/>
       Contributor
@@ -93,7 +93,7 @@ Credits
       Original Author
 
   - orientifoldtest
-    * [Jonathan Carifio]:<br/>
+    * [Jonathan Carifio]():<br/>
       Original Author
     * [Ross Altman](http://github.com/knowbodynos):<br/>
       Contributor
