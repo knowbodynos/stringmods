@@ -1,5 +1,5 @@
 # stringmods
-A collection of open source modules written and maintained by the Northeastern String Theory group, for use in the String Vacuum and String Data projects.
+A collection of open source modules written and maintained by the Northeastern String Theory group, for use in the *String Vacuum* and *String Data* projects.
 
 Contributions of new modules are welcome and encouraged! Contributors will be credited in `CREDITS` file.
 
