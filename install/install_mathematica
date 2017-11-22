@@ -1,0 +1,16 @@
+#!/bin/bash
+
+#Move Mathematica license scripts to USER_LOCAL
+basepath=$(cd $(dirname ${BASH_SOURCE[0]}); pwd -P)
+cp ${basepath}/bin/mathematica_* ${USER_LOCAL}/bin/
+
+#Install Mathematica
+mathpath=$(which math | rev | cut -d'/' -f1,2 --complement | rev)
+mathmsg=$(${mathpath}/monitorlm 2>&1 | head -c -1)
+if [[ "${mathmsg}" != "Could not find a MathLM server." ]]
+then
+    initfile=$(math -noprompt -run "WriteString[\$Output,\$UserBaseDirectory<>\"/Kernel/init.m\"];Exit[];" 2>/dev/null)
+    echo $(cat ${initfile} | grep -v "CRUNCH_ROOT") > $initfile
+    echo "AppendTo[\$Path, Environment[\"CRUNCH_ROOT\"]<>\"/packages/Mathematica/cohomCalg\"]" >> ${initfile}
+    echo "AppendTo[\$Path, Environment[\"CRUNCH_ROOT\"]<>\"/packages/Mathematica/MongoLink\"]" >> ${initfile}
+fi

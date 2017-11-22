@@ -1,0 +1,5 @@
+#!/bin/bash
+
+mathmonitorscript=$(echo $(which math) | sed 's/\(.*\)INSTALL.*/\1monitorlm/g')
+sublicensediff=$(${mathmonitorscript} | grep 'Sub MathKernel' | head -n1 | sed 's/\s\s*/+/g' | cut -d'+' -f4,5 | sed 's/^/-/g' |  head -c -1)
+echo ${sublicensediff} | bc | head -c -1
