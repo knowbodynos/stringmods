@@ -50,7 +50,7 @@ dbusername="manager"
 dbpassword="toric"
 queries="[['MAXCONE',{'${modname}MARK':{'\$exists':False}},{'NORMALFORM':1}]]"
 basecollection="MAXCONE"
-nthreadsfield="30"
+nthreadsfield=""
 
 #Input script info
 scriptlanguage="bash"
@@ -60,7 +60,7 @@ writemode="truncate"
 scriptmemorylimit="500000000"
 scripttimelimit=""
 scriptbuffertime="00:01:00"
-joblimit=""
+joblimit="30"
 
 #Options
 blocking="False"
