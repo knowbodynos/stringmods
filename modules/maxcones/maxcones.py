@@ -2,10 +2,10 @@
 
 from sage.all_cmdline import *;
 
-import sys,json;#,linecache,traceback,mongolink;#os,tempfile,time,datetime,subprocess,signal
-from mongolink.parse import pythonlist2mathematicalist as py2mat;
-from mongolink.parse import mathematicalist2pythonlist as mat2py;
-import mongolink.tools as tools;
+import sys,json;#,linecache,traceback,mongojoin;#os,tempfile,time,datetime,subprocess,signal
+from mongojoin.parse import pythonlist2mathematicalist as py2mat;
+from mongojoin.parse import mathematicalist2pythonlist as mat2py;
+import mongojoin.tools as tools;
 
 #Misc. function definitions
 #def PrintException():
@@ -68,11 +68,11 @@ dbhost=sys.argv[4];
 dbport=sys.argv[5];
 dbname=sys.argv[6];
 if dbtype=="mongodb":
-    import mongolink;
+    import mongojoin;
     if dbusername==None:
-        dbclient=mongolink.MongoClient("mongodb://"+dbhost+":"+dbport+"/"+dbname);
+        dbclient=mongojoin.MongoClient("mongodb://"+dbhost+":"+dbport+"/"+dbname);
     else:
-        dbclient=mongolink.MongoClient("mongodb://"+dbusername+":"+dbpassword+"@"+dbhost+":"+dbport+"/"+dbname+"?authMechanism=SCRAM-SHA-1");
+        dbclient=mongojoin.MongoClient("mongodb://"+dbusername+":"+dbpassword+"@"+dbhost+":"+dbport+"/"+dbname+"?authMechanism=SCRAM-SHA-1");
     db=dbclient[dbname];
 
 for line in iter(sys.stdin.readline,''):

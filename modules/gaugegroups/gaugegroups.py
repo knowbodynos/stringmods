@@ -19,8 +19,8 @@ import re
 import bson
 import sys
 from collections import Counter
-# from mongolink.parse import pythonlist2mathematicalist as py2mat
-# from mongolink.parse import mathematicalist2pythonlist as mat2py
+# from mongojoin.parse import pythonlist2mathematicalist as py2mat
+# from mongojoin.parse import mathematicalist2pythonlist as mat2py
 
 ### FORMAT CONVERTERS ###
 

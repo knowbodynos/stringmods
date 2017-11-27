@@ -7,9 +7,9 @@
 from sage.all_cmdline import *;
 
 import sys,os,fcntl,errno,linecache,traceback,time,subprocess,signal,json;
-import mongolink.tools as tools;
-from mongolink.parse import pythonlist2mathematicalist as py2mat;
-from mongolink.parse import mathematicalist2pythonlist as mat2py;
+import mongojoin.tools as tools;
+from mongojoin.parse import pythonlist2mathematicalist as py2mat;
+from mongojoin.parse import mathematicalist2pythonlist as mat2py;
 
 #################################################################################
 #Misc. function definitions

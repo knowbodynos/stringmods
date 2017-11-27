@@ -6,9 +6,9 @@
 
 from sage.all_cmdline import *;
 
-import sys,os,fcntl,errno,linecache,traceback,time,subprocess,signal,json,mongolink;
-from mongolink.parse import pythonlist2mathematicalist as py2mat;
-from mongolink.parse import mathematicalist2pythonlist as mat2py;
+import sys,os,fcntl,errno,linecache,traceback,time,subprocess,signal,json,mongojoin;
+from mongojoin.parse import pythonlist2mathematicalist as py2mat;
+from mongojoin.parse import mathematicalist2pythonlist as mat2py;
 
 #################################################################################
 #Misc. function definitions
@@ -53,8 +53,8 @@ def match(itensXD_pair,c2Xnums_pair,eX_pair,mori_rows_pair):
                         #The singularity is contained within some intersection of divisors in both Kahler cones
                         set0=Set(range0).subsets(min(len(range0),3)).list();
                         set1=Set(range1).subsets(min(len(range1),3)).list();
-                        inums0=[mongolink.nestind(itensXD_pair[0],list(y)) for y in set0];
-                        inums1=[mongolink.nestind(itensXD_pair[1],list(y)) for y in set1];
+                        inums0=[mongojoin.nestind(itensXD_pair[0],list(y)) for y in set0];
+                        inums1=[mongojoin.nestind(itensXD_pair[1],list(y)) for y in set1];
                         flop=flop and all([y==0 for y in flatten(inums0+inums1)]);
                     else:
                         #The singularity is not contained in any intersection of divisors for at least one Kahler cone, so it cannot be checked the the CY avoids it
@@ -89,9 +89,9 @@ def glue_mori(DtoJmat,mori_rows_group):
     for x in mori_rows_group[1:]:
         g_mori=g_mori.intersection(Cone(x));
     g_mori_rows=[list(x) for x in g_mori.rays().column_matrix().columns()];
-    g_mori_cols=mongolink.transpose_list(g_mori_rows);
+    g_mori_cols=mongojoin.transpose_list(g_mori_rows);
     g_kahler_cols=[sum([DtoJmat[k][j]*vector(g_mori_cols[j]) for j in range(len(g_mori_cols))]) for k in range(len(DtoJmat))];
-    g_kahler_rows=mongolink.transpose_list(g_kahler_cols);
+    g_kahler_rows=mongojoin.transpose_list(g_kahler_cols);
     return [g_mori_rows,g_kahler_rows];
 
 #################################################################################
@@ -110,10 +110,10 @@ try:
     with open(mongourifile,"r") as mongouristream:
         mongouri=mongouristream.readline().rstrip("\n");
 
-    mongoclient=mongolink.MongoClient(mongouri+"?authMechanism=SCRAM-SHA-1");
+    mongoclient=mongojoin.MongoClient(mongouri+"?authMechanism=SCRAM-SHA-1");
     dbname=mongouri.split("/")[-1];
     db=mongoclient[dbname];
-    triangdocs=mongolink.collectionfind(db,'TRIANGtemp',{'H11':h11,'POLYID':polyid},{'_id':0,'GEOMN':1,'TRIANGN':1,'ALLTRIANGN':1,'BASIS':1,'EULER':1,'JTOD':1,'INVBASIS':1,'CHERN2XJ':1,'CHERN2XNUMS':1,'IPOLYXJ':1,'ITENSXJ':1,'TRIANG':1,'SRIDEAL':1,'CHERN2XD':1,'IPOLYAD':1,'ITENSAD':1,'IPOLYXD':1,'ITENSXD':1,'IPOLYAJ':1,'ITENSAJ':1,'CHERNAD':1,'CHERNAJ':1,'CHERN3XD':1,'CHERN3XJ':1,'MORIMATP':1,'KAHLERMATP':1},formatresult='string');
+    triangdocs=mongojoin.collectionfind(db,'TRIANGtemp',{'H11':h11,'POLYID':polyid},{'_id':0,'GEOMN':1,'TRIANGN':1,'ALLTRIANGN':1,'BASIS':1,'EULER':1,'JTOD':1,'INVBASIS':1,'CHERN2XJ':1,'CHERN2XNUMS':1,'IPOLYXJ':1,'ITENSXJ':1,'TRIANG':1,'SRIDEAL':1,'CHERN2XD':1,'IPOLYAD':1,'ITENSAD':1,'IPOLYXD':1,'ITENSXD':1,'IPOLYAJ':1,'ITENSAJ':1,'CHERNAD':1,'CHERNAJ':1,'CHERN3XD':1,'CHERN3XJ':1,'MORIMATP':1,'KAHLERMATP':1},formatresult='string');
     mongoclient.close();
     #print triangdocs[0];
     #Create lists of properties to check for consistency when gluing

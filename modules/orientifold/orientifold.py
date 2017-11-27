@@ -18,10 +18,10 @@ from time import time
 import json
 from random import randint
 from collections import defaultdict
-import mongolink.tools as tools
-import mongolink.parse as parse
-from mongolink.parse import pythonlist2mathematicalist as py2mat
-from mongolink.parse import mathematicalist2pythonlist as mat2py
+import mongojoin.tools as tools
+import mongojoin.parse as parse
+from mongojoin.parse import pythonlist2mathematicalist as py2mat
+from mongojoin.parse import mathematicalist2pythonlist as mat2py
 import sys
 import re
     

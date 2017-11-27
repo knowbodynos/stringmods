@@ -6,9 +6,9 @@
 
 from sage.all_cmdline import *;
 
-import sys,os,fcntl,errno,linecache,traceback,time,subprocess,signal,json,mongolink;
-from mongolink.parse import pythonlist2mathematicalist as py2mat;
-from mongolink.parse import mathematicalist2pythonlist as mat2py;
+import sys,os,fcntl,errno,linecache,traceback,time,subprocess,signal,json,mongojoin;
+from mongojoin.parse import pythonlist2mathematicalist as py2mat;
+from mongojoin.parse import mathematicalist2pythonlist as mat2py;
 from mpi4py import MPI;
 
 comm=MPI.COMM_WORLD;
@@ -40,7 +40,7 @@ def mori(dresverts,triang):
     conelist=[Cone([aug_dresverts[i] for i in x]) for x in triang];
     cone_combs=[x for x in Set([y for y in conelist if y.dim()==4]).subsets(2).list() if x[0].intersection(x[1]).dim()==3];
     cone_intersects=[x[0].intersection(x[1]).rays().matrix().rows()+[aug_dresverts[-1]] for x in cone_combs];
-    cone_unions=[mongolink.deldup(x[0].rays().matrix().rows()+x[1].rays().matrix().rows()+[aug_dresverts[-1]]) for x in cone_combs];
+    cone_unions=[mongojoin.deldup(x[0].rays().matrix().rows()+x[1].rays().matrix().rows()+[aug_dresverts[-1]]) for x in cone_combs];
     compl_pos=[[i for i in range(len(cone_unions[j])) if cone_unions[j][i] not in cone_intersects[j]] for j in range(len(cone_unions))];
     kers=[matrix(x).left_kernel().matrix().rows() for x in cone_unions];
     sel_kers=[[x if all([x[i]>0 for i in compl_pos[j]]) else -x if all([x[i]<0 for i in compl_pos[j]]) else None for x in kers[j]] for j in range(len(kers))];
@@ -180,8 +180,8 @@ def match(itensXD_pair,c2Xnums_pair,eX_pair,mori_rows_pair):
                         #The singularity is contained within some intersection of divisors in both Kahler cones
                         set0=Set(range0).subsets(min(len(range0),3)).list();
                         set1=Set(range1).subsets(min(len(range1),3)).list();
-                        inums0=[mongolink.nestind(itensXD_pair[0],list(y)) for y in set0];
-                        inums1=[mongolink.nestind(itensXD_pair[1],list(y)) for y in set1];
+                        inums0=[mongojoin.nestind(itensXD_pair[0],list(y)) for y in set0];
+                        inums1=[mongojoin.nestind(itensXD_pair[1],list(y)) for y in set1];
                         flop=flop and all([y==0 for y in flatten(inums0+inums1)]);
                     else:
                         #The singularity is not contained in any intersection of divisors for at least one Kahler cone, so it cannot be checked the the CY avoids it
@@ -216,9 +216,9 @@ def glue_mori(DtoJmat,mori_rows_group):
     for x in mori_rows_group[1:]:
         g_mori=g_mori.intersection(Cone(x));
     g_mori_rows=[list(x) for x in g_mori.rays().column_matrix().columns()];
-    g_mori_cols=mongolink.transpose_list(g_mori_rows);
+    g_mori_cols=mongojoin.transpose_list(g_mori_rows);
     g_kahler_cols=[sum([DtoJmat[k][j]*vector(g_mori_cols[j]) for j in range(len(g_mori_cols))]) for k in range(len(DtoJmat))];
-    g_kahler_rows=mongolink.transpose_list(g_kahler_cols);
+    g_kahler_rows=mongojoin.transpose_list(g_kahler_cols);
     return [g_mori_rows,g_kahler_rows];
 
 #################################################################################
@@ -240,10 +240,10 @@ if rank==0:
         with open(mongourifile,"r") as mongouristream:
             mongouri=mongouristream.readline().rstrip("\n");
 
-        mongoclient=mongolink.MongoClient(mongouri+"?authMechanism=SCRAM-SHA-1");
+        mongoclient=mongojoin.MongoClient(mongouri+"?authMechanism=SCRAM-SHA-1");
         dbname=mongouri.split("/")[-1];
         db=mongoclient[dbname];
-        triangs=mongolink.collectionfind(db,'TRIANGtemp',{'H11':h11,'POLYID':polyid},{'_id':0,'GEOMN':1,'TRIANG':1},formatresult='expression');
+        triangs=mongojoin.collectionfind(db,'TRIANGtemp',{'H11':h11,'POLYID':polyid},{'_id':0,'GEOMN':1,'TRIANG':1},formatresult='expression');
         #print triangs;
         #sys.stdout.flush();
         mongoclient.close();
@@ -260,7 +260,7 @@ if rank==0:
         Ibasechange=[x[0]-x[1] for x in basis];
         Iprechow=C.ideal(Ilin+Ibasechange);
         ######################## Begin parallel MPI scatter/gather of geometrical information ###############################
-        scatt=[[C,DD,JJ,dresverts,DtoJmat,Iprechow,x] for x in mongolink.distribcores(triangs,size)];
+        scatt=[[C,DD,JJ,dresverts,DtoJmat,Iprechow,x] for x in mongojoin.distribcores(triangs,size)];
         #If fewer cores are required than are available, pass extraneous cores no information
         if len(scatt)<size:
             scatt+=[-2 for x in range(len(scatt),size)];
@@ -272,9 +272,9 @@ if rank==0:
         for t in triangs_chunk:
             #Obtain Mori and Kahler matrices
             mori_rows=mori(dresverts_chunk,t['TRIANG']);
-            mori_cols=mongolink.transpose_list(mori_rows);
+            mori_cols=mongojoin.transpose_list(mori_rows);
             kahler_cols=[sum([DtoJmat_chunk[k][j]*vector(mori_cols[j]) for j in range(len(mori_cols))]) for k in range(len(DtoJmat_chunk))];
-            kahler_rows=mongolink.transpose_list(kahler_cols);
+            kahler_rows=mongojoin.transpose_list(kahler_cols);
             #Obtain Stanley-Reisner ideal and Chow ideal
             SR=SR_ideal(dresverts_chunk,t['TRIANG']);
             SRid=[prod([DD_chunk[j] for j in x]) for x in SR];
@@ -353,9 +353,9 @@ else:
                 for t in triangs_chunk:
                     #Obtain Mori and Kahler matrices
                     mori_rows=mori(dresverts_chunk,t['TRIANG']);
-                    mori_cols=mongolink.transpose_list(mori_rows);
+                    mori_cols=mongojoin.transpose_list(mori_rows);
                     kahler_cols=[sum([DtoJmat_chunk[k][j]*vector(mori_cols[j]) for j in range(len(mori_cols))]) for k in range(len(DtoJmat_chunk))];
-                    kahler_rows=mongolink.transpose_list(kahler_cols);
+                    kahler_rows=mongojoin.transpose_list(kahler_cols);
                     #Obtain Stanley-Reisner ideal and Chow ideal
                     SR=SR_ideal(dresverts_chunk,t['TRIANG']);
                     SRid=[prod([DD_chunk[j] for j in x]) for x in SR];

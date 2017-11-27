@@ -2,9 +2,9 @@
 
 from sage.all_cmdline import *;
 
-import sys,os,linecache,traceback,subprocess,signal,json,mongolink;
-from mongolink.parse import pythonlist2mathematicalist as py2mat;
-from mongolink.parse import mathematicalist2pythonlist as mat2py;
+import sys,os,linecache,traceback,subprocess,signal,json,mongojoin;
+from mongojoin.parse import pythonlist2mathematicalist as py2mat;
+from mongojoin.parse import mathematicalist2pythonlist as mat2py;
 
 #################################################################################
 #Misc. function definitions
@@ -39,10 +39,10 @@ try:
     with open(mongourifile,"r") as mongouristream:
         mongouri=mongouristream.readline().rstrip("\n");
 
-    mongoclient=mongolink.MongoClient(mongouri+"?authMechanism=SCRAM-SHA-1");
+    mongoclient=mongojoin.MongoClient(mongouri+"?authMechanism=SCRAM-SHA-1");
     dbname=mongouri.split("/")[-1];
     db=mongoclient[dbname];
-    involdocs=mongolink.collectionfind(db,'INVOL',{'H11':h11,'POLYID':polyid,'GEOMN':oldgeomn,'TRIANGN':oldtriangn},{'_id':0,'INVOLN':1},formatresult='expression');
+    involdocs=mongojoin.collectionfind(db,'INVOL',{'H11':h11,'POLYID':polyid,'GEOMN':oldgeomn,'TRIANGN':oldtriangn},{'_id':0,'INVOLN':1},formatresult='expression');
     #Add new properties to base tier of JSON
     if len(involdocs)==0:
         print "None";

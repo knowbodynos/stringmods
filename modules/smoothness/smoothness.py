@@ -1,8 +1,8 @@
 #!/shared/apps/sage-7.4/local/bin/sage -python
 
 from sage.all_cmdline import *;
-import sys,json,mongolink,itertools;
-from mongolink.parse import mathematicalist2pythonlist as mat2py
+import sys,json,mongojoin,itertools;
+from mongojoin.parse import mathematicalist2pythonlist as mat2py
 
 involdoc=json.loads(sys.argv[1]);
 polyid=involdoc['POLYID'];
@@ -15,7 +15,7 @@ symcyterms=involdoc['SYMCYPOLY'];
 gens="("+",".join(["x"+str(i+1) for i in range(len(rescws))])+")";
 var(gens.replace("(","").replace(")","").replace(","," "));
 srideal=eval(involdoc['SRIDEAL'].replace("{","[[").replace("}","]]").replace(",","],[").replace("*",",").replace("D","x"));
-supersrsectors=mongolink.deldup([set(x) for x in list(itertools.product(*srideal))]);
+supersrsectors=mongojoin.deldup([set(x) for x in list(itertools.product(*srideal))]);
 srsectors=[str([y-1 for y in supersrsectors[i]]).replace("[","").replace("]","").replace(" ","") for i in range(len(supersrsectors)) if not any([supersrsectors[i].issuperset(x) for x in supersrsectors[:i]+supersrsectors[i+1:]])];
 
 singular.option("noredefine");
