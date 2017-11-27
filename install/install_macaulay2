@@ -3,6 +3,9 @@
 currpath=$(pwd)
 
 #Install Macaulay2
+
+echo "Installing Macaulay2 package to \${USER_LOCAL}/bin..."
+
 if [ "$(command -v M2)" == "" ]
 then
     cd ${HOME}

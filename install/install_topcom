@@ -3,6 +3,9 @@
 currpath=$(pwd)
 
 #Install TOPCOM
+
+echo "Installing TOPCOM package to \${USER_LOCAL}/bin..."
+
 if [ "$(command -v points2ntriangs)" == "" ]
 then
     cd ${HOME}

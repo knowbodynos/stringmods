@@ -1,0 +1,17 @@
+#!/bin/bash
+
+# Install cohomCalg
+
+echo "Installing cohomCalg package to \${USER_LOCAL}/bin..."
+
+mathpath=$(which math | rev | cut -d'/' -f1,2 --complement | rev)
+mathmsg=$(${mathpath}/monitorlm 2>&1 | head -c -1)
+if [[ "${mathmsg}" != "Could not find a MathLM server." ]]
+then
+    initfile=$(math -noprompt -run "WriteString[\$Output,\$UserBaseDirectory<>\"/Kernel/init.m\"];Exit[];" 2>/dev/null)
+    if ! grep -q "cohomCalg" ${initfile}
+    then
+        echo "AppendTo[\$Path, Environment[\"USER_LOCAL\"]<>\"/bin/cohomCalg\"]" >> ${initfile}
+    fi
+    #    echo "AppendTo[\$Path, Environment[\"CRUNCH_ROOT\"]<>\"/packages/Mathematica/MongoLink\"]" >> ${initfile}
+fi

@@ -2,7 +2,10 @@
 
 currpath=$(pwd)
 
-#Install jq
+# Install jq
+
+echo "Installing jq package to \${USER_LOCAL}/bin..."
+
 if [ "$(command -v jq)" == "" ]
 then
     cd ${USER_LOCAL}/bin

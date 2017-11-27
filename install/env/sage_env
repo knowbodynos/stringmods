@@ -1,0 +1,6 @@
+# sage_env
+
+# Source Sage environment variables
+
+#export SAGE_ROOT=/shared/apps/sage/sage-5.12
+export SAGE_ROOT=/shared/apps/sage-7.4
