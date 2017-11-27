@@ -61,6 +61,20 @@ def timestamp2unit(timestamp,unit="seconds"):
 #for line in sys.stdin:#docstream:
 #for line in iter(sys.stdin.readline, ''):
 #line=sys.stdin.readline();
+dbtype=sys.argv[1];
+dbusername=sys.argv[2];
+dbpassword=sys.argv[3];
+dbhost=sys.argv[4];
+dbport=sys.argv[5];
+dbname=sys.argv[6];
+if dbtype=="mongodb":
+    import mongolink;
+    if dbusername==None:
+        dbclient=mongolink.MongoClient("mongodb://"+dbhost+":"+dbport+"/"+dbname);
+    else:
+        dbclient=mongolink.MongoClient("mongodb://"+dbusername+":"+dbpassword+"@"+dbhost+":"+dbport+"/"+dbname+"?authMechanism=SCRAM-SHA-1");
+    db=dbclient[dbname];
+
 for line in iter(sys.stdin.readline,''):
     #with open("/gss_gpfs_scratch/altman.ro/SLURMongo/scripts/1.err","w") as errstream:
     #    errstream.write(line);
@@ -119,7 +133,8 @@ for line in iter(sys.stdin.readline,''):
             faceinfolist+=[dim0+dim1+dim2];
         else:
             nformcountlist[nformlist.index(nform)]+=1;
-
+    
+    nformexistlist=[x["NORMALFORM"] for x in list(db["MAXCONE"].find({"NORMALFORM":{"$in":[py2mat(nform) for nform in nformlist]}},{"_id":0,"NORMALFORM":1}).limit(len(nformlist)))];
     #print("+POLY."+json.dumps({'POLYID':polyid},separators=(',',':'))+">"+json.dumps({'DVERTS':py2mat(dverts)},separators=(',',':')));
     #sys.stdout.flush();
     
@@ -130,8 +145,10 @@ for line in iter(sys.stdin.readline,''):
         ninstances=nformcountlist[i];
         maxconenormals+=[{'NORMALFORM':py2mat(nform),'NINST':ninstances}];
         #print("&MAXCONE."+json.dumps({'NORMALFORM':py2mat(nform)},separators=(',',':'))+">"+json.dumps({'POS':{'POLYID':polyid,'NINST':ninstances}},separators=(',',':')));
-        print("+MAXCONE."+json.dumps({'NORMALFORM':py2mat(nform)},separators=(',',':'))+">"+json.dumps({'FACEINFO':py2mat(faceinfo)},separators=(',',':')));
-        sys.stdout.flush();
+        mat_nform=py2mat(nform);
+        if mat_nform not in formexistlist:
+            print("+MAXCONE."+json.dumps({'NORMALFORM':mat_nform},separators=(',',':'))+">"+json.dumps({'FACEINFO':py2mat(faceinfo)},separators=(',',':')));
+            sys.stdout.flush();
 
     print("+POLY."+json.dumps({'POLYID':polyid},separators=(',',':'))+">"+json.dumps({'DVERTS':py2mat(dverts),'MAXCONENORMALS':maxconenormals},separators=(',',':')));
     print("@");#+basecoll+"."+json.dumps(dict([(x,polydoc[x]) for x in dbindexes]),separators=(',',':')));
@@ -139,7 +156,7 @@ for line in iter(sys.stdin.readline,''):
     #line=sys.stdin.readline();
 
 #        line=docstream.readline();
-
+dbclient.close();
 #if __name__ == "__main__":
 #    main();
 
