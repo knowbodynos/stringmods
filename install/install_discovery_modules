@@ -15,14 +15,22 @@ if ! grep -q "# Source DBCrunch modules for Discovery" ${HOME}/.bashrc
 then
     echo "" >> ${HOME}/.bashrc
     echo "# Source DBCrunch modules for Discovery" >> ${HOME}/.bashrc
-    echo ". $(echo ${installpath}/env/discovery_modules_env | sed 's|'"${CRUNCH_ROOT}"'|${CRUNCH_ROOT}|g' | sed 's|'"${HOME}"'|${HOME}|g' | sed 's|'"${USER}"'|${USER}|g') " >> ${HOME}/.bashrc
+    echo "" >> ${HOME}/.bashrc
+    echo "if [ -f $(echo ${installpath}/env/discovery_modules_env | sed 's|'"${CRUNCH_ROOT}"'|${CRUNCH_ROOT}|g' | sed 's|'"${HOME}"'|${HOME}|g' | sed 's|'"${USER}"'|${USER}|g') ]" >> ${HOME}/.bashrc
+    echo "then" >> ${HOME}/.bashrc
+    echo "    . $(echo ${installpath}/env/discovery_modules_env | sed 's|'"${CRUNCH_ROOT}"'|${CRUNCH_ROOT}|g' | sed 's|'"${HOME}"'|${HOME}|g' | sed 's|'"${USER}"'|${USER}|g')" >> ${HOME}/.bashrc
+    echo "fi" >> ${HOME}/.bashrc
 fi
 
 if ! grep -q "# Source Sage environment variables" ${HOME}/.bashrc
 then
     echo "" >> ${HOME}/.bashrc
     echo "# Source Sage environment variables" >> ${HOME}/.bashrc
-    echo ". $(echo ${installpath}/env/sage_env | sed 's|'"${CRUNCH_ROOT}"'|${CRUNCH_ROOT}|g' | sed 's|'"${HOME}"'|${HOME}|g' | sed 's|'"${USER}"'|${USER}|g') " >> ${HOME}/.bashrc
+    echo "" >> ${HOME}/.bashrc
+    echo "if [ -f $(echo ${installpath}/env/sage_env | sed 's|'"${CRUNCH_ROOT}"'|${CRUNCH_ROOT}|g' | sed 's|'"${HOME}"'|${HOME}|g' | sed 's|'"${USER}"'|${USER}|g') ]" >> ${HOME}/.bashrc
+    echo "then" >> ${HOME}/.bashrc
+    echo "    . $(echo ${installpath}/env/sage_env | sed 's|'"${CRUNCH_ROOT}"'|${CRUNCH_ROOT}|g' | sed 's|'"${HOME}"'|${HOME}|g' | sed 's|'"${USER}"'|${USER}|g')" >> ${HOME}/.bashrc
+    echo "fi" >> ${HOME}/.bashrc
 fi
 
 . ${HOME}/.bashrc
