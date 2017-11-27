@@ -146,7 +146,7 @@ for line in iter(sys.stdin.readline,''):
         maxconenormals+=[{'NORMALFORM':py2mat(nform),'NINST':ninstances}];
         #print("&MAXCONE."+json.dumps({'NORMALFORM':py2mat(nform)},separators=(',',':'))+">"+json.dumps({'POS':{'POLYID':polyid,'NINST':ninstances}},separators=(',',':')));
         mat_nform=py2mat(nform);
-        if mat_nform not in formexistlist:
+        if mat_nform not in nformexistlist:
             print("+MAXCONE."+json.dumps({'NORMALFORM':mat_nform},separators=(',',':'))+">"+json.dumps({'FACEINFO':py2mat(faceinfo)},separators=(',',':')));
             sys.stdout.flush();
 
