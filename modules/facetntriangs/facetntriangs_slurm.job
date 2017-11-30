@@ -57,8 +57,8 @@ dbport="27017"
 dbname="MLEARN"
 dbusername="manager"
 dbpassword="toric"
-queries="[['MAXCONE',{'${modname}MARK':{'\$exists':False}},{'NORMALFORM':1}]]"
-basecollection="MAXCONE"
+queries="[['FACET',{'${modname}MARK':{'\$exists':False}},{'NORMALFORM':1}]]"
+basecollection="FACET"
 nthreadsfield=""
 
 #Options

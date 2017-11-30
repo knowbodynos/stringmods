@@ -1,16 +1,16 @@
 #!/bin/bash
 
 #Job name
-#SBATCH -J "crunch_facetnfinetriangs_template_controller"
+#SBATCH -J "crunch_facetfinetriangs_template_controller"
 #################
 #Working directory
-#SBATCH -D "path_to_module/facetnfinetriangs/template"
+#SBATCH -D "path_to_module/facetfinetriangs/template"
 #################
 #Job output file
-#SBATCH -o "crunch_facetnfinetriangs_template_controller.out"
+#SBATCH -o "crunch_facetfinetriangs_template_controller.out"
 #################
 #Job error file
-#SBATCH -e "crunch_facetnfinetriangs_template_controller.err"
+#SBATCH -e "crunch_facetfinetriangs_template_controller.err"
 #################
 #Job file write mode
 #SBATCH --open-mode="append"
@@ -32,7 +32,7 @@
 #################
 
 #Input controller info
-modname="facetnfinetriangs"
+modname="facetfinetriangs"
 controllername="template"
 controllerjobid="${SLURM_JOBID}"
 controllerbuffertime="00:05:00"
@@ -48,8 +48,8 @@ dbport="27017"
 dbname="MLEARN"
 dbusername="manager"
 dbpassword="toric"
-queries="[['MAXCONE',{'${modname}MARK':{'\$exists':False}},{'NORMALFORM':1}]]"
-basecollection="MAXCONE"
+queries="[['FACET',{'${modname}MARK':{'\$exists':False}},{'NORMALFORM':1}]]"
+basecollection="FACET"
 nthreadsfield=""
 
 #Input script info
