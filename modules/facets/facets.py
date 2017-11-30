@@ -118,39 +118,47 @@ for line in iter(sys.stdin.readline,''):
     #dlp_interpts=[dlp_interpts_dup[i] for i in range(len(dlp_interpts_dup)) if dlp_interpts_dup[i] not in dlp_interpts_dup[:i]];
 
     nformlist=[];
+    nform2skellist=[]
     nformcountlist=[];
     faceinfolist=[];
     for facet in dlp.faces_lp(dim=3):
-        nform=[list(w) for w in LatticePolytope(facet.vertices().column_matrix().columns()+[vector((0,0,0,0))]).normal_form().column_matrix().columns()];
+        nform=[list(w) for w in LatticePolytope(facet.vertices().column_matrix().columns()+[vector((0,0,0,0))]).normal_form().column_matrix().columns() if w!=vector((0,0,0,0))];
         if nform not in nformlist:
+            nform2skel=[list(w) for w in LatticePolytope(nform).boundary_points().column_matrix().columns()];
             nformlist+=[nform];
+            nform2skellist+=[nform2skel];
             nformcountlist+=[1];
             dim0=[facet.nvertices()];
             face1intpts=[len(y.interior_points()) for y in facet.faces_lp(dim=1)];
-            dim1=[len(face1intpts),sum(face1intpts),min(face1intpts),max(face1intpts)];
+            face1bdrypts=[len(y.boundary_points()) for y in facet.faces_lp(dim=1)];
+            dim1int=[len(face1intpts),sum(face1intpts),min(face1intpts),max(face1intpts)];
+            dim1bdry=[len(face1bdrypts),sum(face1bdrypts),min(face1bdrypts),max(face1bdrypts)];
             face2intpts=[len(y.interior_points()) for y in facet.faces_lp(dim=2)];
-            dim2=[len(face2intpts),sum(face2intpts),min(face2intpts),max(face2intpts)];
-            faceinfolist+=[dim0+dim1+dim2];
+            face2bdrypts=[len(y.boundary_points()) for y in facet.faces_lp(dim=2)];
+            dim2int=[len(face2intpts),sum(face2intpts),min(face2intpts),max(face2intpts)];
+            dim2bdry=[len(face2bdrypts),sum(face2bdrypts),min(face2bdrypts),max(face2bdrypts)];
+            faceinfolist+=[dim0+dim1int+dim1bdry+dim2int+dim2bdry];
         else:
             nformcountlist[nformlist.index(nform)]+=1;
     
-    nformexistlist=[x["NORMALFORM"] for x in list(db["MAXCONE"].find({"NORMALFORM":{"$in":[py2mat(nform) for nform in nformlist]}},{"_id":0,"NORMALFORM":1}).limit(len(nformlist)))];
+    nformexistlist=[x["NFORM"] for x in list(db["FACET"].find({"NFORM":{"$in":[py2mat(nform) for nform in nformlist]}},{"_id":0,"NFORM":1}).limit(len(nformlist)))];
     #print("+POLY."+json.dumps({'POLYID':polyid},separators=(',',':'))+">"+json.dumps({'DVERTS':py2mat(dverts)},separators=(',',':')));
     #sys.stdout.flush();
     
-    maxconenormals=[];
+    facetlist=[];
     for i in range(len(nformlist)):
         nform=nformlist[i];
+        nform2skel=nform2skellist[i];
         faceinfo=faceinfolist[i];
         ninstances=nformcountlist[i];
-        maxconenormals+=[{'NORMALFORM':py2mat(nform),'NINST':ninstances}];
-        #print("&MAXCONE."+json.dumps({'NORMALFORM':py2mat(nform)},separators=(',',':'))+">"+json.dumps({'POS':{'POLYID':polyid,'NINST':ninstances}},separators=(',',':')));
+        facetlist+=[{'NFORM':py2mat(nform),'NINST':ninstances}];
+        #print("&FACET."+json.dumps({'NFORM':py2mat(nform)},separators=(',',':'))+">"+json.dumps({'POS':{'POLYID':polyid,'NINST':ninstances}},separators=(',',':')));
         mat_nform=py2mat(nform);
         if mat_nform not in nformexistlist:
-            print("+MAXCONE."+json.dumps({'NORMALFORM':mat_nform},separators=(',',':'))+">"+json.dumps({'FACEINFO':py2mat(faceinfo)},separators=(',',':')));
+            print("+FACET."+json.dumps({'NFORM':mat_nform},separators=(',',':'))+">"+json.dumps({'NFORM2SKEL':py2mat(nform2skel),'FACEINFO':py2mat(faceinfo)},separators=(',',':')));
             sys.stdout.flush();
 
-    print("+POLY."+json.dumps({'POLYID':polyid},separators=(',',':'))+">"+json.dumps({'DVERTS':py2mat(dverts),'MAXCONENORMALS':maxconenormals},separators=(',',':')));
+    print("+POLY."+json.dumps({'POLYID':polyid},separators=(',',':'))+">"+json.dumps({'DVERTS':py2mat(dverts),'FACETLIST':facetlist},separators=(',',':')));
     print("@");#+basecoll+"."+json.dumps(dict([(x,polydoc[x]) for x in dbindexes]),separators=(',',':')));
     sys.stdout.flush();
     #line=sys.stdin.readline();

@@ -1,16 +1,16 @@
 #!/bin/bash
 
 #Job name
-#SBATCH -J "crunch_maxcones_template_controller"
+#SBATCH -J "crunch_facets_template_controller"
 #################
 #Working directory
-#SBATCH -D "path_to_module/maxcones/template"
+#SBATCH -D "path_to_module/facets/template"
 #################
 #Job output file
-#SBATCH -o "crunch_maxcones_template_controller.out"
+#SBATCH -o "crunch_facets_template_controller.out"
 #################
 #Job error file
-#SBATCH -e "crunch_maxcones_template_controller.err"
+#SBATCH -e "crunch_facets_template_controller.err"
 #################
 #Job file write mode
 #SBATCH --open-mode="append"
@@ -32,7 +32,7 @@
 #################
 
 #Input controller info
-modname="maxcones"
+modname="facets"
 controllername="template"
 controllerjobid="${SLURM_JOBID}"
 controllerbuffertime="00:05:00"
