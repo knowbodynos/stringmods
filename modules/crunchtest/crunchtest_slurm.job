@@ -1,16 +1,16 @@
 #!/bin/bash
 
 #Job name
-#SBATCH -J "crunch_facetfinetriangs_template_controller"
+#SBATCH -J "crunch_crunchtest_template_controller"
 #################
 #Working directory
-#SBATCH -D "path_to_module/facetfinetriangs/template"
+#SBATCH -D "path_to_module/crunchtest/template"
 #################
 #Job output file
-#SBATCH -o "crunch_facetfinetriangs_template_controller.out"
+#SBATCH -o "crunch_crunchtest_template_controller.out"
 #################
 #Job error file
-#SBATCH -e "crunch_facetfinetriangs_template_controller.err"
+#SBATCH -e "crunch_crunchtest_template_controller.err"
 #################
 #Job file write mode
 #SBATCH --open-mode="append"
@@ -19,7 +19,7 @@
 #SBATCH --time="1-00:00:00"
 #################
 #Partition (queue) to use for job
-#SBATCH --partition="ser-par-10g-4"
+#SBATCH --partition="ser-par-10g"
 #################
 #Number of tasks (CPUs) allocated for job
 #SBATCH -n 1
@@ -32,7 +32,7 @@
 #################
 
 #Input controller info
-modname="facetfinetriangs"
+modname="crunchtest"
 controllername="template"
 controllerjobid="${SLURM_JOBID}"
 controllerbuffertime="00:05:00"
@@ -45,35 +45,33 @@ dbusername="manager"
 dbpassword="toric"
 dbhost="129.10.135.170"
 dbport="27017"
-dbname="MLEARN"
-dbusername="manager"
-dbpassword="toric"
-#queries="[['FACET',{'${modname}MARK':{'\$exists':False}},{'NFORM':1,'NFORM2SKEL':1}]]"
-queries="[['FACET',{'${modname}MARK':False},{'NFORM':1,'NFORM2SKEL':1}]]"
-basecollection="FACET"
+dbname="test"
+queries="[['TEST',{'INPUT':{'\$lte':1000},'${modname}MARK':{'\$exists':False}},{'INPUT':1},{'HINT':{'INPUT':1}}]]"
+#,{'SORT':[('POLYID',1)]}]]"
+basecollection="TEST"
 nthreadsfield=""
 
 #Input script info
-scriptlanguage="bash"
-scriptargs=""
+scriptlanguage="python"
+scriptargs="${dbtype} ${dbusername} ${dbpassword} ${dbhost} ${dbport} ${dbname}"
 partitions="ser-par-10g,ser-par-10g-2,ser-par-10g-3,ser-par-10g-4"
 writemode="truncate"
 scriptmemorylimit="500000000"
 scripttimelimit=""
 scriptbuffertime="00:01:00"
-joblimit="30"
+joblimit="50"
 
 #Options
 blocking="False"
 logging="True"
-templocal="False"
-writelocal="False"
+templocal="True"
+writelocal="True"
 writedb="True"
-statslocal="False"
+statslocal="True"
 statsdb="True"
 markdone="MARK"
-cleanup=""
-niters="20"
+cleanup="100"
+niters="200"
 nbatch="5"
 nworkers="2"
 

@@ -155,7 +155,7 @@ for line in iter(sys.stdin.readline,''):
         #print("&FACET."+json.dumps({'NFORM':py2mat(nform)},separators=(',',':'))+">"+json.dumps({'POS':{'POLYID':polyid,'NINST':ninstances}},separators=(',',':')));
         mat_nform=py2mat(nform);
         if mat_nform not in nformexistlist:
-            print("+FACET."+json.dumps({'NFORM':mat_nform},separators=(',',':'))+">"+json.dumps({'NFORM2SKEL':py2mat(nform2skel),'FACEINFO':py2mat(faceinfo)},separators=(',',':')));
+            print("+FACET."+json.dumps({'NFORM':mat_nform},separators=(',',':'))+">"+json.dumps({'NFORM2SKEL':py2mat(nform2skel),'FACEINFO':py2mat(faceinfo),'facetfinetriangsMARK':False,'facetallfinetriangsMARK':False},separators=(',',':')));
             sys.stdout.flush();
 
     print("+POLY."+json.dumps({'POLYID':polyid},separators=(',',':'))+">"+json.dumps({'DVERTS':py2mat(dverts),'FACETLIST':facetlist},separators=(',',':')));
