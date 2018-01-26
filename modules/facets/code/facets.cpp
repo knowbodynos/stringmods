@@ -44,7 +44,9 @@ they are wrapped in the namespace PALP.
 #include <stdio.h>
 #include "Eigen/Core"
 #include "Eigen/LU"
+#include "rapidjson/document.h"
 
+using namespace rapidjson;
 using namespace std;
 
 typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> PolyMatrix;
@@ -858,282 +860,299 @@ int main(int argc, char** argv) {
 	string vertstr4 = "{{4,-1,-1,-1},{-1,1,0,0},{-1,0,1,0},{-1,0,0,0}}";
 	vector<vector<int>> verts = string_to_vertex_list(vertstr1);
 	*/
-	int polyid = atoi(argv[1]);
-	vector<vector<int>> verts = string_to_vertex_list(argv[2]);
-
-	PolyMatrix pmat(verts[0].size(),verts.size());
-	for (int i=0; i < verts.size(); i++) {
-		for (int j=0; j < verts[0].size(); j++) {
-			pmat(j,i) = (double) verts[i][j];
-		}
-	}
-
-	PolyMatrix origin(verts[0].size(),1);
-		for (int i=0; i < verts[0].size(); i++) {
-			origin(i,0) = (double) 0;
-		}
 	
-	LatticePolytope p = LatticePolytope(pmat);
+	//int polyid = atoi(argv[1]);
+	//vector<vector<int>> verts = string_to_vertex_list(argv[2]);
 
-	/*cout << "Equations 1:" << endl;
-	p.print_equations();*/
+	string line;
+	Document doc;
+	int polyid;
+	vector<vector<int>> verts;
+	while (getline(cin, line)) {
+		if (doc.Parse(line.c_str()).HasParseError())
+	        return 1;
+	    assert(doc["POLYID"].IsInt());
+	    assert(doc["NVERTS"].IsString());
 
-	/*
-	cout << "The LatticePolytope p has " << p.nvertices() << " vertices" << endl;
-	cout << "The LatticePolytope p has ambient dimension " << p.ambient_dim() << endl;
-	cout << "The LatticePolytope p has dimension " << p.dim() << endl;
-	cout << "The LatticePolytope is ";
-	if (!p.is_reflexive()) {
-		cout << "not ";
-	}
-	cout << "reflexive" << endl;
-	*/
+		polyid = doc["POLYID"].GetInt();
+		verts = string_to_vertex_list(doc["NVERTS"].GetString());
 
-	/*cout << "Equations 2:" << endl;
-	p.print_equations();*/
+		PolyMatrix pmat(verts[0].size(),verts.size());
+		for (int i=0; i < verts.size(); i++) {
+			for (int j=0; j < verts[0].size(); j++) {
+				pmat(j,i) = (double) verts[i][j];
+			}
+		}
 
-	/*
-	cout << "The polytope has " << p.npoints() << " points" << endl;
+		PolyMatrix origin(verts[0].size(),1);
+			for (int i=0; i < verts[0].size(); i++) {
+				origin(i,0) = (double) 0;
+			}
+		
+		LatticePolytope p = LatticePolytope(pmat);
 
-	cout << "p.vnlist is: \t";
-	PALP::VertexNumList vnlist = p.get_vnlist();
-	for (int i = 0; i < p.nvertices(); i++) {
-		cout << vnlist.v[i] << "\t";
-	}
-	cout << endl;
-
-	cout << "The f-vector of p is:" << endl;
-	for (int w : p.f_vector()) {
-		cout << w << "\t";
-	}
-	cout << endl;
-	*/
-
-	/*cout << "Equations 3:" << endl;
-	p.print_equations();*/
-
-	//cout << "The vertex string is: " << p.vertex_string() << endl;
-
-	/*cout << "Equations 4:" << endl;
-	p.print_equations();*/
-
-	/*
-	if (p.is_reflexive()) {
-
-		cout << "The normal form is:" << endl;
-		cout << p.normal_form() << endl;
-		cout << "or in string form: " << polymat_to_string(p.normal_form()) << endl;
-	
-
-		cout << "The Hodge numbers are:" << endl;
-		vector<int> hnums = p.hodge();
-		cout << "h11: " << hnums[0] << endl;
-		cout << "h21: " << hnums[1] << endl;
-	}
-	*/
-
-	/*cout << "Equations 5:" << endl;
-	p.print_equations();*/
-
-	/*
-	PolyMatrix nf = p.normal_form();
-	cout << "The normal form is:" << endl;
-	cout << nf << endl;
-	cout << "or in string form: " << polymat_to_string(nf) << endl;
-
-	cout << "The boundary points are:" << endl;
-	cout << p.boundary_points() << endl;
-	cout << "of which there are:" << endl;
-	cout << p.boundary_points().cols() << endl;
-
-	cout << "The interior points are:" << endl;
-	cout << p.interior_points() << endl;
-	cout << "of which there are:" << endl;
-	cout << p.interior_points().cols() << endl;
-
-	vector<int> orig = {0,0,0,0};
-	cout << "p ";
-	if (p.interior_contains(orig)) {cout << "contains ";}
-	else {cout << "does not contain ";}
-	cout << "the origin" << endl;
-	*/
-
-	/*vector<int> pt1 = {1,4,1,0};
-	vector<int> pt2 = {0,-1,-1,0};
-	vector<int> pt3 = {2,4,6,8};
-	cout << p.boundary_contains(pt1) << endl;
-	cout << p.boundary_contains(pt2) << endl;
-	cout << p.boundary_contains(pt3) << endl;
-	cout << p.interior_contains(pt1) << endl;
-	cout << p.interior_contains(pt2) << endl;
-	cout << p.interior_contains(pt3) << endl;*/
-
-	if (p.is_reflexive()) {
-		// For the dual
-		LatticePolytope dp = p.polar();
+		/*cout << "Equations 1:" << endl;
+		p.print_equations();*/
 
 		/*
-		cout << "The dual LatticePolytope dp has " << dp.nvertices() << " vertices" << endl;
-		cout << "The dual LatticePolytope dp has ambient dimension " << dp.ambient_dim() << endl;
-		cout << "The dual LatticePolytope dp has dimension " << dp.dim() << endl;
-		cout << "The dual LatticePolytope is ";
-		if (!dp.is_reflexive()) {
+		cout << "The LatticePolytope p has " << p.nvertices() << " vertices" << endl;
+		cout << "The LatticePolytope p has ambient dimension " << p.ambient_dim() << endl;
+		cout << "The LatticePolytope p has dimension " << p.dim() << endl;
+		cout << "The LatticePolytope is ";
+		if (!p.is_reflexive()) {
 			cout << "not ";
 		}
 		cout << "reflexive" << endl;
+		*/
 
-		cout << "The dual polytope has " << dp.npoints() << " points" << endl;
+		/*cout << "Equations 2:" << endl;
+		p.print_equations();*/
 
-		cout << "dp.vnlist is: \t";
-		PALP::VertexNumList vnlistd = dp.get_vnlist();
-		for (int i = 0; i < dp.nvertices(); i++) {
-			cout << vnlistd.v[i] << "\t";
+		/*
+		cout << "The polytope has " << p.npoints() << " points" << endl;
+
+		cout << "p.vnlist is: \t";
+		PALP::VertexNumList vnlist = p.get_vnlist();
+		for (int i = 0; i < p.nvertices(); i++) {
+			cout << vnlist.v[i] << "\t";
 		}
 		cout << endl;
 
-		if (dp.is_reflexive()) {
-			cout << "The dual normal form is:" << endl;
-			cout << dp.normal_form() << endl;
-			cout << "or in string form: " << polymat_to_string(dp.normal_form()) << endl;
-		
-
-			cout << "The dual Hodge numbers are:" << endl;
-			vector<int> dhnums = dp.hodge();
-			cout << "h11: " << dhnums[0] << endl;
-			cout << "h21: " << dhnums[1] << endl;
-		}
-		*/
-
-		//cout << "The vertices of dp are:" << endl;
-		cout << "+POLY.{\"POLYID\":" << polyid << "}>{\"DVERT\":\"" << polymat_to_string(dp.vertices()) << "\",";
-
-		//cout << "The points of the 2-skeleton of dp are:" << endl;
-		cout << "\"DRESVERTS\":\"" << polymat_to_string(dp.p_boundary_points(3)) << "\",";
-
-		/*
-		cout << "The integral points of dp are: " << endl;
-		cout << dp.integral_points() << endl;
-
-		cout << "The 3d faces of dp are: " << endl;
-		*/
-
-		vector<PolyMatrix> dfaces3 = dp.faces(3);
-		
-		/*
-		for (PolyMatrix fm : dfaces3) {
-			cout << "=====" << endl;
-			cout << fm << endl;
-		}
-
-		cout << "Boundary and interior points of faces of dp are: " << endl;
-
-		for (PolyMatrix fm : dfaces3) {
-			LatticePolytope fmp = LatticePolytope(add_col(fm, origin));
-			PolyMatrix fmverts = remove_col(fmp.vertices(), origin);
-			PolyMatrix fm1bdry = remove_col(fmp.p_boundary_points(1), origin);
-			PolyMatrix fm1inter = remove_col(fmp.p_interior_points(1), origin);
-			PolyMatrix fm2bdry = remove_col(fmp.p_boundary_points(2), origin);
-			PolyMatrix fm2inter = remove_col(fmp.p_interior_points(2), origin);
-			PolyMatrix fm3bdry = remove_col(fmp.p_boundary_points(3), origin);
-			PolyMatrix fm3inter = remove_col(fmp.p_interior_points(3), origin);
-			PolyMatrix fmpoints = remove_col(fmp.integral_points(), origin);
-			
-			cout << "=====" << endl;
-			cout << fmverts.cols() << " " << fm1bdry.cols() << " " << fm1inter.cols() << " "  << fm2bdry.cols() << " " << fm2inter.cols()  << " "  << fm3bdry.cols() << " " << fm3inter.cols() << " " << fmpoints.cols() << endl;
-		}
-
-		cout << "The 2-skeletons of the 3d faces of dp are: " << endl;
-		*/
-
-		vector<PolyMatrix> nffs;
-		vector<PolyMatrix> nf2skels;
-		for (PolyMatrix fm : dfaces3) {
-			LatticePolytope fmp = LatticePolytope(add_col(fm, origin));
-
-			PolyMatrix nf = fmp.normal_form();
-			PolyMatrix nff = remove_col(nf, origin);
-			nffs.push_back(nff);
-
-			LatticePolytope nfp = LatticePolytope(nf);
-
-			PolyMatrix nf2skel = remove_col(nfp.p_boundary_points(3), origin);
-			nf2skels.push_back(nf2skel);
-			//cout << "=====" << endl;
-			//cout << nf2skel << endl;
-		}
-
-		vector<PolyMatrix> nffsuniq;
-		vector<PolyMatrix> nf2skelsuniq;
-		vector<int> nffsmult;
-		int uniq;
-		int equal;
-		for (int i = 0; i < nffs.size(); i++) {
-			uniq = 1;
-			for (int j = 0; j < nffsuniq.size(); j++) {
-				if (nffs[i].rows() == nffsuniq[j].rows() && nffs[i].cols() == nffsuniq[j].cols()) {
-					equal = 1;
-					for (int k = 0; k < nffs[i].rows(); k++) {
-						for (int l = 0; l < nffs[i].cols(); l++) {
-							if (nffs[i](k,l) != nffsuniq[j](k,l)) {
-								equal = 0;
-							}
-						}
-					}
-					if (equal == 1) {
-						uniq = 0;
-						nffsmult[j]++;
-					}
-				}
-			}
-			if (uniq == 1) {
-				nffsuniq.push_back(nffs[i]);
-				nf2skelsuniq.push_back(nf2skels[i]);
-				nffsmult.push_back(1);
-			}
-		}
-
-		//cout << "The unique 2-skeletons of the 3d faces of dp are: " << endl;
-		cout << "\"FACETLIST\":\"[";
-
-		for (int i = 0; i < nffsuniq.size(); i++) {
-			//cout << "=====" << endl;
-			if (i > 0) {
-				cout << ",";
-			}
-			cout << "{\"NFORM\":\"" << polymat_to_string(nffsuniq[i]) << "\",\"NINST\":\"" << nffsmult[i] << "\"}";
-		}
-		cout << "]}";
-
-		cout << endl;
-
-		for (int i = 0; i < nffsuniq.size(); i++) {
-			//cout << "=====" << endl;
-			cout << "+FACET.{\"NFORM\":\"" << polymat_to_string(nffsuniq[i]) << "\"}>{\"NFORM2SKEL\":\"" << polymat_to_string(nf2skelsuniq[i]) << "\",\"facetfinetriangsMARK\":false,\"facetallfinetriangsMARK\":false}" << endl;
-		}
-
-		/*
-		cout << "The f-vector of dp is:" << endl;
-		for (int w : dp.f_vector()) {
+		cout << "The f-vector of p is:" << endl;
+		for (int w : p.f_vector()) {
 			cout << w << "\t";
 		}
 		cout << endl;
+		*/
 
-		cout << "The dual vertex string is: " << dp.vertex_string() << endl;
+		/*cout << "Equations 3:" << endl;
+		p.print_equations();*/
+
+		//cout << "The vertex string is: " << p.vertex_string() << endl;
+
+		/*cout << "Equations 4:" << endl;
+		p.print_equations();*/
+
+		/*
+		if (p.is_reflexive()) {
+
+			cout << "The normal form is:" << endl;
+			cout << p.normal_form() << endl;
+			cout << "or in string form: " << polymat_to_string(p.normal_form()) << endl;
+		
+
+			cout << "The Hodge numbers are:" << endl;
+			vector<int> hnums = p.hodge();
+			cout << "h11: " << hnums[0] << endl;
+			cout << "h21: " << hnums[1] << endl;
+		}
+		*/
+
+		/*cout << "Equations 5:" << endl;
+		p.print_equations();*/
+
+		/*
+		PolyMatrix nf = p.normal_form();
+		cout << "The normal form is:" << endl;
+		cout << nf << endl;
+		cout << "or in string form: " << polymat_to_string(nf) << endl;
 
 		cout << "The boundary points are:" << endl;
-		cout << dp.boundary_points() << endl;
+		cout << p.boundary_points() << endl;
 		cout << "of which there are:" << endl;
-		cout << dp.boundary_points().cols() << endl;
+		cout << p.boundary_points().cols() << endl;
 
 		cout << "The interior points are:" << endl;
-		cout << dp.interior_points() << endl;
+		cout << p.interior_points() << endl;
 		cout << "of which there are:" << endl;
-		cout << dp.interior_points().cols() << endl;
+		cout << p.interior_points().cols() << endl;
 
-		cout << "dp ";
-		if (dp.interior_contains(orig)) {cout << "contains ";}
+		vector<int> orig = {0,0,0,0};
+		cout << "p ";
+		if (p.interior_contains(orig)) {cout << "contains ";}
 		else {cout << "does not contain ";}
-		cout << "the origin" << endl;	
-		*/																
+		cout << "the origin" << endl;
+		*/
+
+		/*vector<int> pt1 = {1,4,1,0};
+		vector<int> pt2 = {0,-1,-1,0};
+		vector<int> pt3 = {2,4,6,8};
+		cout << p.boundary_contains(pt1) << endl;
+		cout << p.boundary_contains(pt2) << endl;
+		cout << p.boundary_contains(pt3) << endl;
+		cout << p.interior_contains(pt1) << endl;
+		cout << p.interior_contains(pt2) << endl;
+		cout << p.interior_contains(pt3) << endl;*/
+
+		if (p.is_reflexive()) {
+			// For the dual
+			LatticePolytope dp = p.polar();
+
+			/*
+			cout << "The dual LatticePolytope dp has " << dp.nvertices() << " vertices" << endl;
+			cout << "The dual LatticePolytope dp has ambient dimension " << dp.ambient_dim() << endl;
+			cout << "The dual LatticePolytope dp has dimension " << dp.dim() << endl;
+			cout << "The dual LatticePolytope is ";
+			if (!dp.is_reflexive()) {
+				cout << "not ";
+			}
+			cout << "reflexive" << endl;
+
+			cout << "The dual polytope has " << dp.npoints() << " points" << endl;
+
+			cout << "dp.vnlist is: \t";
+			PALP::VertexNumList vnlistd = dp.get_vnlist();
+			for (int i = 0; i < dp.nvertices(); i++) {
+				cout << vnlistd.v[i] << "\t";
+			}
+			cout << endl;
+
+			if (dp.is_reflexive()) {
+				cout << "The dual normal form is:" << endl;
+				cout << dp.normal_form() << endl;
+				cout << "or in string form: " << polymat_to_string(dp.normal_form()) << endl;
+			
+
+				cout << "The dual Hodge numbers are:" << endl;
+				vector<int> dhnums = dp.hodge();
+				cout << "h11: " << dhnums[0] << endl;
+				cout << "h21: " << dhnums[1] << endl;
+			}
+			*/
+
+			//cout << "The vertices of dp are:" << endl;
+			cout << "+POLY.{\"POLYID\":" << polyid << "}>{\"DVERT\":\"" << polymat_to_string(dp.vertices()) << "\",";
+
+			//cout << "The points of the 2-skeleton of dp are:" << endl;
+			cout << "\"DRESVERTS\":\"" << polymat_to_string(dp.p_boundary_points(3)) << "\",";
+
+			/*
+			cout << "The integral points of dp are: " << endl;
+			cout << dp.integral_points() << endl;
+
+			cout << "The 3d faces of dp are: " << endl;
+			*/
+
+			vector<PolyMatrix> dfaces3 = dp.faces(3);
+			
+			/*
+			for (PolyMatrix fm : dfaces3) {
+				cout << "=====" << endl;
+				cout << fm << endl;
+			}
+
+			cout << "Boundary and interior points of faces of dp are: " << endl;
+
+			for (PolyMatrix fm : dfaces3) {
+				LatticePolytope fmp = LatticePolytope(add_col(fm, origin));
+				PolyMatrix fmverts = remove_col(fmp.vertices(), origin);
+				PolyMatrix fm1bdry = remove_col(fmp.p_boundary_points(1), origin);
+				PolyMatrix fm1inter = remove_col(fmp.p_interior_points(1), origin);
+				PolyMatrix fm2bdry = remove_col(fmp.p_boundary_points(2), origin);
+				PolyMatrix fm2inter = remove_col(fmp.p_interior_points(2), origin);
+				PolyMatrix fm3bdry = remove_col(fmp.p_boundary_points(3), origin);
+				PolyMatrix fm3inter = remove_col(fmp.p_interior_points(3), origin);
+				PolyMatrix fmpoints = remove_col(fmp.integral_points(), origin);
+				
+				cout << "=====" << endl;
+				cout << fmverts.cols() << " " << fm1bdry.cols() << " " << fm1inter.cols() << " "  << fm2bdry.cols() << " " << fm2inter.cols()  << " "  << fm3bdry.cols() << " " << fm3inter.cols() << " " << fmpoints.cols() << endl;
+			}
+
+			cout << "The 2-skeletons of the 3d faces of dp are: " << endl;
+			*/
+
+			vector<PolyMatrix> nffs;
+			vector<PolyMatrix> nf2skels;
+			for (PolyMatrix fm : dfaces3) {
+				LatticePolytope fmp = LatticePolytope(add_col(fm, origin));
+
+				PolyMatrix nf = fmp.normal_form();
+				PolyMatrix nff = remove_col(nf, origin);
+				nffs.push_back(nff);
+
+				LatticePolytope nfp = LatticePolytope(nf);
+
+				PolyMatrix nf2skel = remove_col(nfp.p_boundary_points(3), origin);
+				nf2skels.push_back(nf2skel);
+				//cout << "=====" << endl;
+				//cout << nf2skel << endl;
+			}
+
+			vector<PolyMatrix> nffsuniq;
+			vector<PolyMatrix> nf2skelsuniq;
+			vector<int> nffsmult;
+			int uniq;
+			int equal;
+			for (int i = 0; i < nffs.size(); i++) {
+				uniq = 1;
+				for (int j = 0; j < nffsuniq.size(); j++) {
+					if (nffs[i].rows() == nffsuniq[j].rows() && nffs[i].cols() == nffsuniq[j].cols()) {
+						equal = 1;
+						for (int k = 0; k < nffs[i].rows(); k++) {
+							for (int l = 0; l < nffs[i].cols(); l++) {
+								if (nffs[i](k,l) != nffsuniq[j](k,l)) {
+									equal = 0;
+								}
+							}
+						}
+						if (equal == 1) {
+							uniq = 0;
+							nffsmult[j]++;
+						}
+					}
+				}
+				if (uniq == 1) {
+					nffsuniq.push_back(nffs[i]);
+					nf2skelsuniq.push_back(nf2skels[i]);
+					nffsmult.push_back(1);
+				}
+			}
+
+			//cout << "The unique 2-skeletons of the 3d faces of dp are: " << endl;
+			cout << "\"FACETLIST\":\"[";
+
+			for (int i = 0; i < nffsuniq.size(); i++) {
+				//cout << "=====" << endl;
+				if (i > 0) {
+					cout << ",";
+				}
+				cout << "{\"NFORM\":\"" << polymat_to_string(nffsuniq[i]) << "\",\"NINST\":\"" << nffsmult[i] << "\"}";
+			}
+			cout << "]}";
+
+			cout << endl;
+
+			for (int i = 0; i < nffsuniq.size(); i++) {
+				//cout << "=====" << endl;
+				cout << "+FACET.{\"NFORM\":\"" << polymat_to_string(nffsuniq[i]) << "\"}>{\"NFORM2SKEL\":\"" << polymat_to_string(nf2skelsuniq[i]) << "\",\"facetfinetriangsMARK\":false,\"facetallfinetriangsMARK\":false}" << endl;
+			}
+
+			cout << "@" << endl;
+
+			/*
+			cout << "The f-vector of dp is:" << endl;
+			for (int w : dp.f_vector()) {
+				cout << w << "\t";
+			}
+			cout << endl;
+
+			cout << "The dual vertex string is: " << dp.vertex_string() << endl;
+
+			cout << "The boundary points are:" << endl;
+			cout << dp.boundary_points() << endl;
+			cout << "of which there are:" << endl;
+			cout << dp.boundary_points().cols() << endl;
+
+			cout << "The interior points are:" << endl;
+			cout << dp.interior_points() << endl;
+			cout << "of which there are:" << endl;
+			cout << dp.interior_points().cols() << endl;
+
+			cout << "dp ";
+			if (dp.interior_contains(orig)) {cout << "contains ";}
+			else {cout << "does not contain ";}
+			cout << "the origin" << endl;	
+			*/																
+		}
 	}
 }
