@@ -1021,7 +1021,7 @@ int main(int argc, char** argv) {
 			*/
 
 			//cout << "The vertices of dp are:" << endl;
-			cout << "+POLY.{\"POLYID\":" << polyid << "}>{\"DVERT\":\"" << polymat_to_string(dp.vertices()) << "\",";
+			cout << "+POLY.{\"POLYID\":" << polyid << "}>{\"DVERTS\":\"" << polymat_to_string(dp.vertices()) << "\",";
 
 			//cout << "The points of the 2-skeleton of dp are:" << endl;
 			cout << "\"DRESVERTS\":\"" << polymat_to_string(dp.p_boundary_points(3)) << "\",";
@@ -1109,14 +1109,14 @@ int main(int argc, char** argv) {
 			}
 
 			//cout << "The unique 2-skeletons of the 3d faces of dp are: " << endl;
-			cout << "\"FACETLIST\":\"[";
+			cout << "\"FACETLIST\":[";
 
 			for (int i = 0; i < nffsuniq.size(); i++) {
 				//cout << "=====" << endl;
 				if (i > 0) {
 					cout << ",";
 				}
-				cout << "{\"NFORM\":\"" << polymat_to_string(nffsuniq[i]) << "\",\"NINST\":\"" << nffsmult[i] << "\"}";
+				cout << "{\"NFORM\":\"" << polymat_to_string(nffsuniq[i]) << "\",\"NINST\":" << nffsmult[i] << "}";
 			}
 			cout << "]}";
 
