@@ -1,0 +1,66 @@
+option(noredefine);
+
+string smooth = "true";
+int ntries = 3;
+
+poly p;
+for (int i = 1; i <= size(pterms); i = i + 1) {
+    p = p + (random(-2 * size(pterms), 2 * size(pterms)) * pterms[i]);
+}
+
+poly preduced;
+list ideals_list;
+for (int i = 1; i <= ntriangs; i = i + 1) {  
+    intmat triang_points[ndim][ndim];
+    for (int j = 1; j <= ndim; j = j + 1) {
+        for (int k = 1; k <= ndim; k = k + 1) {
+            triang_points[j,k] = points[triangs[i,j] + 1,k];
+        }
+    }
+    int triang_det = det(triang_points);
+    if (triang_det != 1 && triang_det != -1) {
+	    ideal in_triang;
+		ideal not_in_triang;
+	    for (int j = 1; j <= npoints; j = j + 1) {
+	        int flag_in_triang = 0;
+	        for (int k = 1; k <= ndim; k = k + 1) {
+	            if (j == triangs[i,k]) {
+	                flag_in_triang = 1;
+	            }
+	        }
+	        if (flag_in_triang == 0) {
+	            not_in_triang = not_in_triang + (x(j) - 1);
+	        } else {
+	            in_triang = in_triang + x(j);
+	        }
+	    }
+	    preduced = reduce(p, std(in_triang + not_in_triang));
+		for (int s = 1; s <= ntries && preduced == 0; s = s + 1) {
+		    p = 0;
+		    for (int i = 1; i <= size(pterms); i = i + 1) {
+			    p = p + (random(-2 * size(pterms), 2 * size(pterms)) * pterms[i]);
+			}
+			preduced = reduce(p, std(in_triang + not_in_triang));
+		}
+	    if (preduced == 0) {
+	        smooth = "false";
+	        break;
+	    } else {
+	        ideals_list = insert(ideals_list, not_in_triang); 
+	    }
+    }
+}
+
+if (smooth == "true") {
+	int ideal_dim;
+	for (int i = 1; i <= size(ideals_list); i = i + 1) {
+		ideal_dim = dim(groebner(p + jacob(p) + ideals_list[i]));
+		if (ideal_dim > -1) {
+		    smooth = "false";
+		    break;
+		}
+	}
+}
+
+print(smooth);
+exit;
