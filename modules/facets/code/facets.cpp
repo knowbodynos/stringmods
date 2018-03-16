@@ -1021,7 +1021,7 @@ int main(int argc, char** argv) {
 			*/
 
 			//cout << "The vertices of dp are:" << endl;
-			cout << "POLY set {\"POLYID\":" << polyid << "} {\"DVERTS\":\"" << polymat_to_string(dp.vertices()) << "\",";
+			cout << "set POLY {\"POLYID\":" << polyid << "} {\"DVERTS\":\"" << polymat_to_string(dp.vertices()) << "\",";
 
 			//cout << "The points of the 2-skeleton of dp are:" << endl;
 			cout << "\"DRESVERTS\":\"" << polymat_to_string(dp.p_boundary_points(3)) << "\",";
@@ -1124,7 +1124,7 @@ int main(int argc, char** argv) {
 
 			for (int i = 0; i < nffsuniq.size(); i++) {
 				//cout << "=====" << endl;
-				cout << " FACET set {\"NFORM\":\"" << polymat_to_string(nffsuniq[i]) << "\"} {\"NFORM2SKEL\":\"" << polymat_to_string(nf2skelsuniq[i]) << "\",\"facetfinetriangsMARK\":false,\"facetallfinetriangsMARK\":false}" << endl;
+				cout << "set FACET {\"NFORM\":\"" << polymat_to_string(nffsuniq[i]) << "\"} {\"NFORM2SKEL\":\"" << polymat_to_string(nf2skelsuniq[i]) << "\",\"facetfinetriangsMARK\":false,\"facetallfinetriangsMARK\":false}" << endl;
 			}
 
 			cout << endl;
