@@ -5,7 +5,7 @@ while [ "${line}" != "" ]
 do
     nf=$(echo ${line} | jq -r ".NFORM")
     nf2skel=$(echo ${line} | jq -r ".NFORM2SKEL")
-    nfinetriangs=$(echo ${nf2skel} | sed 's/{/[/g' | sed 's/}/]/g' | timeout 3600 points2nfinetriangs 2>/dev/null | head -c -1)
+    nfinetriangs=$(echo ${nf2skel} | sed 's/{/[/g' | sed 's/}/]/g' | timeout 60 points2nfinetriangs 2>/dev/null | head -c -1)
     if [ "${nfinetriangs}" != "" ]
     then
         echo "set FACET {\"NFORM\":\"${nf}\"} {\"FACETNREGTRIANG\":${nfinetriangs}}"
