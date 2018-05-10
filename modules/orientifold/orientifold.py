@@ -1,5 +1,3 @@
-#!/shared/apps/sage/sage-5.12/spkg/bin/sage -python
-
 from sage.all_cmdline import *
 from sage.schemes.toric.variety import normalize_names
 from sage.rings.polynomial.polydict import PolyDict
@@ -18,12 +16,32 @@ from time import time
 import json
 from random import randint
 from collections import defaultdict
-import mongojoin.tools as tools
-import mongojoin.parse as parse
-from mongojoin.parse import pythonlist2mathematicalist as py2mat
-from mongojoin.parse import mathematicalist2pythonlist as mat2py
 import sys
 import re
+
+def deldup(lst):
+    "Delete duplicate elements in lst."
+    return [lst[i] for i in range(len(lst)) if lst[i] not in lst[:i]]
+
+def transpose_list(lst):
+    "Get the transpose of a list of lists."
+    try:
+        if len(lst) == 0:
+            raise IndexError('List is empty.')
+        elif not all([len(x) == len(lst[0]) for x in lst]):
+            raise IndexError('Lists have different sizes.')
+        else:
+            return [[lst[i][j] for i in range(len(lst))] for j in range(len(lst[0]))]
+    except IndexError:
+        return []
+
+def mat2py(mat):
+    py = mat.replace('{', '[').replace('}', ']')
+    return eval(py)
+
+def py2mat(py):
+    mat = str(py).replace(' ', '').replace('[', '{').replace(']', '}')
+    return mat
     
 def inv(invol, poly, pr):
     """Returns the polynomial after being acted on by invol"""
@@ -2012,44 +2030,44 @@ def divisor_case_Xs(rwmat, invol, bi, c, o7Charges, fsets):
 
 def read_JSON(string):
     """Reads in results as a JSON string, returns a dict of which the properties are the values."""
-    string.replace("{","[")
-    string.replace("}","]")
+    string.replace("{", "[")
+    string.replace("}", "]")
     string = string.split('\'')
     string = '\"'.join(string)
     return json.loads(string)
 
 #Hodge splitting
 def hodgesplit(h11, h21, invol, basisinds, dresverts):
-    R=PolynomialRing(QQ,['t'+str(i+1) for i in range(len(basisinds))]+['D'+str(i+1) for i in range(len(dresverts))]+['Ep'+str(i+1) for i in range(len(invol))]+['Em'+str(i+1) for i in range(len(invol))]+['J'+str(i+1) for i in range(len(basisinds))]);
-    vars=R.gens_dict();
-    Ilin=R.ideal([sum([dresverts[i][j]*vars['D'+str(i+1)] for i in range(len(dresverts))]) for j in range(len(dresverts[0]))]);
-    Isplit=R.ideal([z for y in [[2*vars['D'+str(invol[i][0]+1)]-(vars['Ep'+str(i+1)]+vars['Em'+str(i+1)]),2*vars['D'+str(invol[i][1]+1)]-(vars['Ep'+str(i+1)]-vars['Em'+str(i+1)])] for i in range(len(invol))] for z in y]);
-    Ibasisinds=R.ideal([vars['D'+str(basisinds[i]+1)]-vars['J'+str(i+1)] for i in range(len(basisinds))]);
-    hysurf=sum([vars['D'+str(i+1)] for i in range(len(dresverts))]);
-    hyideal=(Ilin+Ibasisinds).quotient(R.ideal(hysurf));
-    J=sum([vars['t'+str(i+1)]*vars['D'+str(basisinds[i]+1)] for i in range(len(basisinds))]);
-    Jreduced=J.reduce(Ilin+Isplit);
-    Isym=R.ideal([y for y in [Jreduced.coefficient(vars['Em'+str(i+1)]) for i in range(len(invol))] if y!=0]);
-    symJ=Jreduced.reduce(Isym);
-    symJcoefficients=tools.transpose_list([y for y in [[symJ.coefficient(vars['Ep'+str(i+1)]),(vars['D'+str(invol[i][0]+1)]+vars['D'+str(invol[i][1]+1)]).reduce(hyideal)] for i in range(len(invol))]+[[symJ.coefficient(vars['D'+str(i+1)]),vars['D'+str(i+1)].reduce(hyideal)] for i in range(len(dresverts))] if y[0]!=0]);
-    Iasym=R.ideal([y for y in [Jreduced.coefficient(vars['Ep'+str(i+1)]) for i in range(len(invol))] if y!=0]);
-    asymJ=Jreduced.reduce(Iasym);
-    asymJcoefficients=tools.transpose_list([y for y in [[asymJ.coefficient(vars['Em'+str(i+1)]),(vars['D'+str(invol[i][0]+1)]-vars['D'+str(invol[i][1]+1)]).reduce(hyideal)] for i in range(len(invol))] if y[0]!=0]);
-    symh11=len(symJcoefficients[0]);
-    symh21=symh11-((h11-h21)/2)
-    h11split=[symh11,h11-symh11];
-    h21split=[symh21,h21-symh21];
-    return [h11split,h21split,symJcoefficients,asymJcoefficients];
+    R = PolynomialRing(QQ, ['t' + str(i + 1) for i in range(len(basisinds))] + ['D' + str(i + 1) for i in range(len(dresverts))] + ['Ep' + str(i + 1) for i in range(len(invol))] + ['Em' + str(i + 1) for i in range(len(invol))] + ['J' + str(i + 1) for i in range(len(basisinds))])
+    vars = R.gens_dict()
+    Ilin = R.ideal([sum([dresverts[i][j] * vars['D' + str(i + 1)] for i in range(len(dresverts))]) for j in range(len(dresverts[0]))])
+    Isplit = R.ideal([z for y in [[2 * vars['D' + str(invol[i][0] + 1)] - (vars['Ep' + str(i + 1)] + vars['Em' + str(i + 1)]), 2 * vars['D' + str(invol[i][1] + 1)] - (vars['Ep' + str(i + 1)] - vars['Em' + str(i + 1)])] for i in range(len(invol))] for z in y])
+    Ibasisinds = R.ideal([vars['D' + str(basisinds[i] + 1)] - vars['J' + str(i + 1)] for i in range(len(basisinds))])
+    hysurf = sum([vars['D' + str(i + 1)] for i in range(len(dresverts))])
+    hyideal = (Ilin + Ibasisinds).quotient(R.ideal(hysurf))
+    J = sum([vars['t' + str(i + 1)] * vars['D' + str(basisinds[i] + 1)] for i in range(len(basisinds))])
+    Jreduced = J.reduce(Ilin + Isplit)
+    Isym = R.ideal([y for y in [Jreduced.coefficient(vars['Em' + str(i + 1)]) for i in range(len(invol))] if y != 0])
+    symJ = Jreduced.reduce(Isym)
+    symJcoefficients = transpose_list([y for y in [[symJ.coefficient(vars['Ep' + str(i + 1)]), (vars['D' + str(invol[i][0] + 1)] + vars['D' + str(invol[i][1] + 1)]).reduce(hyideal)] for i in range(len(invol))] + [[symJ.coefficient(vars['D' + str(i + 1)]), vars['D' + str(i + 1)].reduce(hyideal)] for i in range(len(dresverts))] if y[0] != 0])
+    Iasym = R.ideal([y for y in [Jreduced.coefficient(vars['Ep' + str(i + 1)]) for i in range(len(invol))] if y != 0])
+    asymJ = Jreduced.reduce(Iasym)
+    asymJcoefficients = transpose_list([y for y in [[asymJ.coefficient(vars['Em' + str(i + 1)]), (vars['D' + str(invol[i][0] + 1)] - vars['D' + str(invol[i][1] + 1)]).reduce(hyideal)] for i in range(len(invol))] if y[0] != 0])
+    symh11 = len(symJcoefficients[0])
+    symh21 = symh11 - ((h11 - h21) / 2)
+    h11split = [symh11, h11 - symh11]
+    h21split = [symh21, h21 - symh21]
+    return [h11split, h21split, symJcoefficients, asymJcoefficients]
     
 def allbaseshodgesplit(h11, h21, invol, basisinds, dresverts, rwmat):
-    bases=[x for x in Combinations(range(len(dresverts)),matrix(rwmat).rank()).list() if matrix([rwmat[i] for i in x]).rank()==matrix(rwmat).rank()];
-    result0=[hodgesplit(h11,h21,invol,x,dresverts,rwmat) for x in [basisinds]+bases];
-    result1=[[x[0],x[1]] for x in result0];
-    result=[all([x==result1[0] for x in result1])];
-    result.extend([result0[0][0],result0[0][1],result0[0][2][1],result0[0][3][1]]);
-    return result;
+    bases = [x for x in Combinations(range(len(dresverts)), matrix(rwmat).rank()).list() if matrix([rwmat[i] for i in x]).rank() == matrix(rwmat).rank()]
+    result0 = [hodgesplit(h11, h21, invol, x, dresverts, rwmat) for x in [basisinds] + bases]
+    result1 = [[x[0], x[1]] for x in result0]
+    result = [all([x == result1[0] for x in result1])]
+    result.extend([result0[0][0], result0[0][1], result0[0][2][1], result0[0][3][1]])
+    return result
 
-def main_one(polyid, geonum, trinum, invnum, h11, h21, invol, basisinds, dresverts, sr, rwmat, algorithm=None):
+def main_one(polyid, geonum, trinum, invnum, h11, h21, invol, basisinds, dresverts, sr, rwmat, algorithm = None):
     """Runs the entire routine for a single example."""
 
     # DATA FROM POLYID, GEONUM, TRINUM
@@ -2474,53 +2492,53 @@ def main_all(filename, tofile):
 #with open(docsfile,"r") as docstream:
 #    for line in docstream:
 #@wrap()
-#def main(involdoc,algorithm=None):
+#def main(invol_doc,algorithm=None):
 #docsfile=sys.argv[1];
 #basecoll=sys.argv[2];
 #dbindexes=sys.argv[3:];
 #with open(docsfile,'r') as docstream:
 #    for line in docstream:
 for line in iter(sys.stdin.readline,''):
-    involdoc=json.loads(line.rstrip("\n"));
+    invol_doc = json.loads(line.rstrip("\n"))
     #main_all("h114.txt", "h114-results-vF.txt")
 
     #_ = singular.LIB("sing.lib")
 
     # FOR LOCAL TEST
-    #involdoc = {"DRESVERTS":"{{-1,-1,-1,0},{-1,-1,-1,1},{-1,-1,0,0},{-1,0,-1,1},{0,-1,0,0},{0,0,-1,0},{2,2,2,-1}}","TRIANGN":1,"POLYID":87,"H11":3,"BASIS":"{{J1,D5},{J2,D6},{J3,D7}}","H21":72,"RESCWS":"{{0,1,1},{1,0,1},{1,0,0},{0,1,0},{0,1,0},{1,0,0},{1,1,1}}","INVOLN":1,"GEOMN":1,"SRIDEAL":"{D3*D6,D4*D5,D1*D2*D7}","INVOL":"{D1->D2,D2->D1}"}
-    #involdoc = {"DRESVERTS":"{{-1,0,0,0},{-1,0,0,1},{-1,0,2,0},{-1,4,-2,-1},{1,-1,0,0},{-1,0,1,0},{-1,2,-1,0}}","TRIANGN":1,"POLYID":147,"H11":3,"BASIS":"{{J1,D3},{J2,D4},{J3,D7}}","H21":83,"RESCWS":"{{0,0,1},{0,1,1},{0,0,1},{0,1,1},{2,4,4},{1,2,0},{1,0,0}}","INVOLN":2,"GEOMN":1,"SRIDEAL":"{D1*D3,D2*D4,D5*D6*D7}","INVOL":"{D1->D2,D2->D1,D3->D4,D4->D3}"}
-    #involdoc = read_JSON(str(involdoc))
+    #invol_doc = {"DRESVERTS":"{{-1,-1,-1,0},{-1,-1,-1,1},{-1,-1,0,0},{-1,0,-1,1},{0,-1,0,0},{0,0,-1,0},{2,2,2,-1}}","TRIANGN":1,"POLYID":87,"H11":3,"BASIS":"{{J1,D5},{J2,D6},{J3,D7}}","H21":72,"RESCWS":"{{0,1,1},{1,0,1},{1,0,0},{0,1,0},{0,1,0},{1,0,0},{1,1,1}}","INVOLN":1,"GEOMN":1,"SRIDEAL":"{D3*D6,D4*D5,D1*D2*D7}","INVOL":"{D1->D2,D2->D1}"}
+    #invol_doc = {"DRESVERTS":"{{-1,0,0,0},{-1,0,0,1},{-1,0,2,0},{-1,4,-2,-1},{1,-1,0,0},{-1,0,1,0},{-1,2,-1,0}}","TRIANGN":1,"POLYID":147,"H11":3,"BASIS":"{{J1,D3},{J2,D4},{J3,D7}}","H21":83,"RESCWS":"{{0,0,1},{0,1,1},{0,0,1},{0,1,1},{2,4,4},{1,2,0},{1,0,0}}","INVOLN":2,"GEOMN":1,"SRIDEAL":"{D1*D3,D2*D4,D5*D6*D7}","INVOL":"{D1->D2,D2->D1,D3->D4,D4->D3}"}
+    #invol_doc = read_JSON(str(invol_doc))
 
-    #involdoc = json.loads(line.rstrip("\n"))
+    #invol_doc = json.loads(line.rstrip("\n"))
 
-    polyid = involdoc['POLYID']
-    geonum = involdoc['GEOMN']
-    trinum = involdoc['TRIANGN']
-    invnum = involdoc['INVOLN']
-    h11 = involdoc['H11']
-    h21 = involdoc['H21']
-    invol = involdoc['INVOL']
-    basis = involdoc['BASIS']
-    dresverts = mat2py(involdoc['DRESVERTS'])
-    sr = involdoc['SRIDEAL']
-    rwmat = involdoc['RESCWS']
+    polyid = invol_doc['POLYID']
+    geonum = invol_doc['GEOMN']
+    trinum = invol_doc['TRIANGN']
+    invnum = invol_doc['INVOLN']
+    h11 = invol_doc['H11']
+    h21 = invol_doc['H21']
+    invol = invol_doc['INVOL']
+    basis = invol_doc['BASIS']
+    dresverts = mat2py(invol_doc['DRESVERTS'])
+    sr = invol_doc['SRIDEAL']
+    rwmat = invol_doc['RESCWS']
 
-    invol = tools.deldup([sorted([y-1 for y in x]) for x in mat2py(re.sub("D([0-9]+)->D([0-9]+)",r"[\1,\2]",invol))])
-    basisinds = [x-1 for x in tools.transpose_list(mat2py(re.sub("[JD]","",basis)))[1]]
-    sr = [[y-1 for y in eval(("["+x+"]").replace("D","").replace("*",","))] for x in sr.lstrip("{").rstrip("}").split(",")]
+    invol = deldup([sorted([y - 1 for y in x]) for x in mat2py(re.sub("D([0-9]+)->D([0-9]+)", r"[\1,\2]", invol))])
+    basisinds = [x - 1 for x in transpose_list(mat2py(re.sub("[JD]", "", basis)))[1]]
+    sr = [[y - 1 for y in eval(("[" + x + "]").replace("D", "").replace("*", ","))] for x in sr.lstrip("{").rstrip("}").split(",")]
     rwmat = np.array(mat2py(rwmat))
 
-    rand = randint(0,1)
-    if rand==0:
+    rand = randint(0, 1)
+    if rand == 0:
         algorithm = 'libsingular:groebner'
-    elif rand==1:
+    elif rand == 1:
         algorithm = 'macaulay2:gb'
     
     #query, output = main_one_check(polyid, geonum, trinum, invnum, h11, h21, invol, basisinds, dresverts, sr, rwmat, algorithm=algorithm)
-    query, output = main_one(polyid, geonum, trinum, invnum, h11, h21, invol, basisinds, dresverts, sr, rwmat, algorithm=algorithm)
+    query, output = main_one(polyid, geonum, trinum, invnum, h11, h21, invol, basisinds, dresverts, sr, rwmat, algorithm = algorithm)
 
-    print("+INVOL."+json.dumps(query,separators=(',',':'))+">"+json.dumps(output,separators=(',',':')))
-    print("@");#print("@INVOL."+json.dumps(dict([(x,involdoc[x]) for x in dbindexes]),separators=(',',':')))
+    print("set INVOL " + json.dumps(query, separators=(',', ':')) + " " + json.dumps(output, separators = (',', ':')))
+    print("")#print("@INVOL."+json.dumps(dict([(x,invol_doc[x]) for x in dbindexes]),separators=(',',':')))
     sys.stdout.flush()
 
 #if __name__ == "__main__":
