@@ -20,7 +20,8 @@ divisors = {
 odims = {
     "O3": 3,
     "O5": 5,
-    "O7": 7
+    "O7": 7,
+    "O9": 9
 }
 
 fields = [
@@ -80,7 +81,9 @@ for line in iter(sys.stdin.readline, ''):
 
     has_invol_flag = False
 
-    invol_curs = INVOL.find({"H11": geom_doc['H11'], "POLYID": geom_doc['POLYID'], "GEOMN": geom_doc['GEOMN']}, {"_id": 0, "TRIANGN": 1, "INVOLN": 1, "INVOL": 1, "OPLANES": 1, "INVOLDIVCOHOM": 1, "ITENSXDINVOL": 1, "SRINVOL": 1, "SMOOTH": 1, "H11-": 1}, no_cursor_timeout = True)
+    invol_curs = INVOL.find({"H11": geom_doc['H11'], "POLYID": geom_doc['POLYID'], "GEOMN": geom_doc['GEOMN'], "OPLANES": {"$exists": True}}, \
+                            {"_id": 0, "TRIANGN": 1, "INVOLN": 1, "INVOL": 1, "OPLANES": 1, "INVOLDIVCOHOM": 1, "ITENSXDINVOL": 1, "SRINVOL": 1, "SMOOTH": 1, "H11-": 1, "VOLFORMPARITY": 1}, \
+                            no_cursor_timeout = True)
     for invol_doc in invol_curs:
         has_invol_flag = True
 
@@ -90,7 +93,8 @@ for line in iter(sys.stdin.readline, ''):
             if field in divisors:
                 invol_dict[field] = sum(1 for cohom_string in invol_doc["INVOLDIVCOHOM"] if re.search(divisors[field], cohom_string))
             elif "OPLANES" in invol_doc and invol_doc["OPLANES"] and field in odims:
-                invol_dict[field] = sum(1 for oplane in invol_doc["OPLANES"] if oplane["ODIM"] == odims[field])
+                if (invol_doc["VOLFORMPARITY"] == -1 and field in ["O3", "O7"]) or (invol_doc["VOLFORMPARITY"] == 1 and field in ["O5", "O9"]):
+                    invol_dict[field] = sum(1 for oplane in invol_doc["OPLANES"] if oplane["ODIM"] == odims[field])
             elif field == "HO":
                 invol_dict[field] = [0 for i in range(N - 1)]
             else:
