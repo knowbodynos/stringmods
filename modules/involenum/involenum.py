@@ -80,88 +80,86 @@ for line in iter(sys.stdin.readline, ''):
 
     has_invol_flag = False
 
-    invol_curs = INVOL.find({"H11": geom_doc['H11'], "POLYID": geom_doc['POLYID'], "GEOMN": geom_doc['GEOMN']}, {"_id": 0, "TRIANGN": 1, "INVOLN": 1, "INVOL": 1, "OPLANES": 1, "INVOLDIVCOHOM": 1, "ITENSXDINVOL": 1, "SRINVOL": 1, "CYSINGDIM": 1, "H11-": 1}, no_cursor_timeout = True)
+    invol_curs = INVOL.find({"H11": geom_doc['H11'], "POLYID": geom_doc['POLYID'], "GEOMN": geom_doc['GEOMN']}, {"_id": 0, "TRIANGN": 1, "INVOLN": 1, "INVOL": 1, "OPLANES": 1, "INVOLDIVCOHOM": 1, "ITENSXDINVOL": 1, "SRINVOL": 1, "SMOOTH": 1, "H11-": 1}, no_cursor_timeout = True)
     for invol_doc in invol_curs:
-        if all(x in invol_doc for x in ["TRIANGN", "INVOLN", "INVOL", "OPLANES", "INVOLDIVCOHOM", "ITENSXDINVOL", "SRINVOL", "CYSINGDIM", "H11-"]):
-            has_invol_flag = True
+        has_invol_flag = True
 
-            invol_dict = {}
+        invol_dict = {}
 
+        for field in fields:
+            if field in divisors:
+                invol_dict[field] = sum(1 for cohom_string in invol_doc["INVOLDIVCOHOM"] if re.search(divisors[field], cohom_string))
+            elif "OPLANES" in invol_doc and invol_doc["OPLANES"] and field in odims:
+                invol_dict[field] = sum(1 for oplane in invol_doc["OPLANES"] if oplane["ODIM"] == odims[field])
+            elif field == "HO":
+                invol_dict[field] = [0 for i in range(N - 1)]
+            else:
+                invol_dict[field] = 0
+
+        if all(invol_dict[odim] == 0 for odim in odims):
+            if invol_doc["SMOOTH"]:
+                invol_dict["Free"] = 1
+
+        invol_dict["INVOLS"] = 1
+        invol_dict["HO"][invol_doc["H11-"] - 1] = 1
+
+        invol_dict["dPK3"] = invol_dict["dP"] * invol_dict["K3"]
+        invol_dict["dPWilson"] = invol_dict["dP"] * invol_dict["Wilson"]
+        invol_dict["dPEWilson"] = invol_dict["dP"] * invol_dict["EWilson"]
+        invol_dict["K3Wilson"] = invol_dict["K3"] * invol_dict["Wilson"]
+        invol_dict["K3EWilson"] = invol_dict["K3"] * invol_dict["EWilson"]
+        invol_dict["dPK3Wilson"] = invol_dict["dP"] * invol_dict["K3"] * invol_dict["Wilson"]
+        invol_dict["dPK3EWilson"] = invol_dict["dP"] * invol_dict["K3"] * invol_dict["EWilson"]
+
+        invol_dict["O3"] = invol_dict["O3"]
+        invol_dict["O5"] = invol_dict["O5"]
+        invol_dict["O7"] = invol_dict["O7"]
+        invol_dict["O3O5"] = invol_dict["O3"] * invol_dict["O5"]
+        invol_dict["O3O7"] = invol_dict["O3"] * invol_dict["O7"]
+        invol_dict["O5O7"] = invol_dict["O5"] * invol_dict["O7"]
+        invol_dict["O3O5O7"] = invol_dict["O3"] * invol_dict["O5"] * invol_dict["O7"]
+
+        if invol_doc["ITENSXDINVOL"] and invol_doc["SRINVOL"]:
             for field in fields:
-                if field in divisors:
-                    invol_dict[field] = sum(1 for cohom_string in invol_doc["INVOLDIVCOHOM"] if re.search(divisors[field], cohom_string))
-                elif "OPLANES" in invol_doc and invol_doc["OPLANES"] and field in odims:
-                    invol_dict[field] = sum(1 for oplane in invol_doc["OPLANES"] if oplane["ODIM"] == odims[field])
-                elif field == "HO":
-                    invol_dict[field] = [0 for i in range(N - 1)]
+                if field == "HO":
+                    for i in range(N - 1):
+                        data_dict["TRIANGSR"][field][i] += invol_dict[field][i]
                 else:
-                    invol_dict[field] = 0
+                    data_dict["TRIANGSR"][field] += invol_dict[field]
 
-            if all(invol_dict[odim] == 0 for odim in odims):
-                if invol_doc["CYSINGDIM"]:
-                    if invol_doc["CYSINGDIM"] == -1:
-                        invol_dict["Free"] = 1
-
-            invol_dict["INVOLS"] = 1
-            invol_dict["HO"][invol_doc["H11-"] - 1] = 1
-
-            invol_dict["dPK3"] = invol_dict["dP"] * invol_dict["K3"]
-            invol_dict["dPWilson"] = invol_dict["dP"] * invol_dict["Wilson"]
-            invol_dict["dPEWilson"] = invol_dict["dP"] * invol_dict["EWilson"]
-            invol_dict["K3Wilson"] = invol_dict["K3"] * invol_dict["Wilson"]
-            invol_dict["K3EWilson"] = invol_dict["K3"] * invol_dict["EWilson"]
-            invol_dict["dPK3Wilson"] = invol_dict["dP"] * invol_dict["K3"] * invol_dict["Wilson"]
-            invol_dict["dPK3EWilson"] = invol_dict["dP"] * invol_dict["K3"] * invol_dict["EWilson"]
-
-            invol_dict["O3"] = invol_dict["O3"]
-            invol_dict["O5"] = invol_dict["O5"]
-            invol_dict["O7"] = invol_dict["O7"]
-            invol_dict["O3O5"] = invol_dict["O3"] * invol_dict["O5"]
-            invol_dict["O3O7"] = invol_dict["O3"] * invol_dict["O7"]
-            invol_dict["O5O7"] = invol_dict["O5"] * invol_dict["O7"]
-            invol_dict["O3O5O7"] = invol_dict["O3"] * invol_dict["O5"] * invol_dict["O7"]
-
-            if invol_doc["ITENSXDINVOL"] and invol_doc["SRINVOL"]:
+        if invol_doc["ITENSXDINVOL"]:
+            if invol_doc['INVOL'] in geom_ntriangs_dict:
+                geom_ntriangs_dict[invol_doc['INVOL']] += 1                            
+            else:
+                geom_ntriangs_dict[invol_doc['INVOL']] = 1
+                geom_data_dict[invol_doc['INVOL']] = {}
                 for field in fields:
                     if field == "HO":
+                        geom_data_dict[invol_doc['INVOL']][field] = [0 for i in range(N - 1)]
                         for i in range(N - 1):
-                            data_dict["TRIANGSR"][field][i] += invol_dict[field][i]
+                            geom_data_dict[invol_doc['INVOL']][field][i] += invol_dict[field][i]
                     else:
-                        data_dict["TRIANGSR"][field] += invol_dict[field]
+                        geom_data_dict[invol_doc['INVOL']][field] = invol_dict[field]
 
-            if invol_doc["ITENSXDINVOL"]:
-                if invol_doc['INVOL'] in geom_ntriangs_dict:
-                    geom_ntriangs_dict[invol_doc['INVOL']] += 1                            
+            if invol_doc["SRINVOL"]:
+                if invol_doc['INVOL'] in geom_sr_ntriangs_dict:
+                    geom_sr_ntriangs_dict[invol_doc['INVOL']] += 1
                 else:
-                    geom_ntriangs_dict[invol_doc['INVOL']] = 1
-                    geom_data_dict[invol_doc['INVOL']] = {}
+                    geom_sr_ntriangs_dict[invol_doc['INVOL']] = 1
+                    geom_sr_data_dict[invol_doc['INVOL']] = {}
                     for field in fields:
                         if field == "HO":
-                            geom_data_dict[invol_doc['INVOL']][field] = [0 for i in range(N - 1)]
+                            geom_sr_data_dict[invol_doc['INVOL']][field] = [0 for i in range(N - 1)]
                             for i in range(N - 1):
-                                geom_data_dict[invol_doc['INVOL']][field][i] += invol_dict[field][i]
+                                geom_sr_data_dict[invol_doc['INVOL']][field][i] += invol_dict[field][i]
                         else:
-                            geom_data_dict[invol_doc['INVOL']][field] = invol_dict[field]
+                            geom_sr_data_dict[invol_doc['INVOL']][field] = invol_dict[field]
 
-                if invol_doc["SRINVOL"]:
-                    if invol_doc['INVOL'] in geom_sr_ntriangs_dict:
-                        geom_sr_ntriangs_dict[invol_doc['INVOL']] += 1
-                    else:
-                        geom_sr_ntriangs_dict[invol_doc['INVOL']] = 1
-                        geom_sr_data_dict[invol_doc['INVOL']] = {}
-                        for field in fields:
-                            if field == "HO":
-                                geom_sr_data_dict[invol_doc['INVOL']][field] = [0 for i in range(N - 1)]
-                                for i in range(N - 1):
-                                    geom_sr_data_dict[invol_doc['INVOL']][field][i] += invol_dict[field][i]
-                            else:
-                                geom_sr_data_dict[invol_doc['INVOL']][field] = invol_dict[field]
+            if invol_dict["O3O5"]:
+                geom_invol_anomalies["O3O5"].append({"H11": geom_doc['H11'], "POLYID": geom_doc['POLYID'], "GEOMN": geom_doc['GEOMN'], "TRIANGN": invol_doc['TRIANGN'], "INVOLN": invol_doc['INVOLN'], "INVOL": invol_doc['INVOL'], "SRINVOL": invol_doc['SRINVOL']})
 
-                if invol_dict["O3O5"]:
-                    geom_invol_anomalies["O3O5"].append({"H11": geom_doc['H11'], "POLYID": geom_doc['POLYID'], "GEOMN": geom_doc['GEOMN'], "TRIANGN": invol_doc['TRIANGN'], "INVOLN": invol_doc['INVOLN'], "INVOL": invol_doc['INVOL'], "SRINVOL": invol_doc['SRINVOL']})
-
-                if invol_dict["O5O7"]:
-                    geom_invol_anomalies["O5O7"].append({"H11": geom_doc['H11'], "POLYID": geom_doc['POLYID'], "GEOMN": geom_doc['GEOMN'], "TRIANGN": invol_doc['TRIANGN'], "INVOLN": invol_doc['INVOLN'], "INVOL": invol_doc['INVOL'], "SRINVOL": invol_doc['SRINVOL']})
+            if invol_dict["O5O7"]:
+                geom_invol_anomalies["O5O7"].append({"H11": geom_doc['H11'], "POLYID": geom_doc['POLYID'], "GEOMN": geom_doc['GEOMN'], "TRIANGN": invol_doc['TRIANGN'], "INVOLN": invol_doc['INVOLN'], "INVOL": invol_doc['INVOL'], "SRINVOL": invol_doc['SRINVOL']})
 
     for invol in geom_ntriangs_dict:
         if geom_ntriangs_dict[invol] == geom_doc['NTRIANGS']:

@@ -27,7 +27,7 @@ def disjointNIDs(NIDpairs, swaplist = []):
         fullswaplist = sorted(fullswaplist, key = lambda x: (len(x), x[0]))
     return fullswaplist
 
-for line in iter(sys.stdin.readline,''):
+for line in iter(sys.stdin.readline, ''):
     triang_doc = json.loads(line.rstrip("\n"))
 
     rescws = mat2py(triang_doc['RESCWS'])
