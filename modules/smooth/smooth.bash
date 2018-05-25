@@ -14,7 +14,11 @@ do
     triangs=$(echo ${line} | jq -r ".TRIANG" | sed 's/[}{]//g')
     ntriangs=$(($(echo ${triangs} | tr ',' '\n' | wc -l)/4))
     symcypoly=$(echo ${line} | jq -r ".SYMCYPOLY | tostring" | sed 's/"//g' | sed 's/x\([0-9]*\)/x(\1)/g')
-    smooth=$(timeout 3600 Singular -q -c "int ndim = 4; int npoints = ${npoints}; int ntriangs = ${ntriangs}; intmat points[npoints][ndim] = ${dresverts}; intmat triangs[ntriangs][ndim] = ${triangs}; ring r=1500450271, (x(1..npoints)), dp; vector pterms = ${symcypoly};" ${progdir}/smooth.sing 2>/dev/null | head -c -1)
+    singheader="int ndim = 4; int npoints = ${npoints}; int ntriangs = ${ntriangs}; intmat points[npoints][ndim] = ${dresverts}; intmat triangs[ntriangs][ndim] = ${triangs}; ring r=1500450271, (x(1..npoints)), dp; vector pterms = ${symcypoly};"
+    # echo "##"
+    # echo "# ${line}"
+    # echo "##"
+    smooth=$(timeout 18000 Singular -q -c "${singheader}" ${progdir}/smooth.sing 2>/dev/null | head -c -1)
     echo "set INVOL {\"POLYID\":${polyid},\"GEOMN\":${geomn},\"TRIANGN\":${triangn},\"INVOLN\":${involn}} {\"SMOOTH\":${smooth}}"
     echo ""
     sleep 0.01

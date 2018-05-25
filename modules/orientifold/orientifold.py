@@ -2551,7 +2551,7 @@ def main_all(filename, tofile):
 #dbindexes=sys.argv[3:];
 #with open(docsfile,'r') as docstream:
 #    for line in docstream:
-for line in iter(sys.stdin.readline,''):
+for line in iter(sys.stdin.readline, ''):
     invol_doc = json.loads(line.rstrip("\n"))
     #main_all("h114.txt", "h114-results-vF.txt")
 
@@ -2581,16 +2581,16 @@ for line in iter(sys.stdin.readline,''):
     sr = [[y - 1 for y in eval(("[" + x + "]").replace("D", "").replace("*", ","))] for x in sr.lstrip("{").rstrip("}").split(",")]
     rwmat = np.array(mat2py(rwmat))
 
-    rand = randint(0, 1)
-    if rand == 0:
-        algorithm = 'libsingular:groebner'
-    elif rand == 1:
-        algorithm = 'macaulay2:gb'
+    #rand = randint(0, 1)
+    #if rand == 0:
+    #    algorithm = 'libsingular:groebner'
+    #elif rand == 1:
+    algorithm = 'macaulay2:gb'
     
     #query, output = main_one_check(polyid, geonum, trinum, invnum, h11, h21, invol, basisinds, dresverts, sr, rwmat, algorithm=algorithm)
     query, output = main_one(polyid, geonum, trinum, invnum, h11, h21, invol, basisinds, dresverts, sr, rwmat, algorithm = algorithm)
 
-    print("set INVOL " + json.dumps(query, separators=(',', ':')) + " " + json.dumps(output, separators = (',', ':')))
+    print("set INVOL " + json.dumps(query, separators = (',', ':')) + " " + json.dumps(output, separators = (',', ':')))
     print("")#print("@INVOL."+json.dumps(dict([(x,invol_doc[x]) for x in dbindexes]),separators=(',',':')))
     sys.stdout.flush()
 

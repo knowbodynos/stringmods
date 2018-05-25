@@ -1,4 +1,4 @@
-import sys, operator, itertools, json 
+import sys, operator, itertools, json
 
 def mat2py(mat):
     py = mat.replace('{', '[').replace('}', ']')
@@ -24,7 +24,7 @@ def disjointNIDs(NIDpairs, swaplist = []):
         fullswaplist += disjointNIDs(newNIDpairs, newswaplist)
         firstflag = False
     if len(swaplist) == 0:
-        fullswaplist = sorted(fullswaplist, key = lambda x: (len(x), x[0]))
+        fullswaplist = sorted(fullswaplist, key = lambda x: [len(x), x[0]])
     return fullswaplist
 
 for line in iter(sys.stdin.readline, ''):
@@ -34,13 +34,14 @@ for line in iter(sys.stdin.readline, ''):
     divcohom = mat2py(triang_doc['DIVCOHOM'])
     itensXD = mat2py(triang_doc['ITENSXD'])
     SRideal = triang_doc['SRIDEAL']
+    
     SRsets = sorted([[y - 1 for y in eval(("[" + x + "]").replace("D", "").replace("*", ","))] for x in SRideal.lstrip("{").rstrip("}").split(",")], key = lambda x: (len(x), operator.itemgetter(*range(len(x)))(x)))
+    
     itensXDsets = []
     for i in range(len(rescws)):
         for j in range(i, len(rescws)):
             for k in range(j, len(rescws)):
                 itensXDsets.append([[i, j, k], itensXD[i][j][k]])
-    itensXDsets = sorted(itensXDsets, key = lambda x: (len(x[0]), operator.itemgetter(*range(len(x[0])))(x[0])))
 
     newdivcohom = [py2mat(x) for x in divcohom]
 
@@ -59,18 +60,18 @@ for line in iter(sys.stdin.readline, ''):
 
     disjointsets = disjointNIDs(NIDpairs)
 
-    allowedinvols = []
+    #allowedinvols = []
     involn = 1
     for invol in disjointsets:
         newSRsets = []
         for SRset in SRsets:
-            newSRset = SRset
+            newSRset = SRset[:]
             for x in invol:
                 newSRset = [x[1] if y == x[0] else x[0] if y == x[1] else y for y in newSRset]
             newSRset = sorted(newSRset)
             newSRsets.append(newSRset)
-        newSRsets = sorted(newSRsets, key = lambda x: (len(x), operator.itemgetter(*range(len(x)))(x)))
-        
+        newSRsets = sorted(newSRsets, key = lambda x: [len(x)] + [x[i] for i in range(len(x))])
+
         newitensXDsets = []
         for itensXDset in itensXDsets:
             newitensXDset = itensXDset[0]
@@ -78,16 +79,17 @@ for line in iter(sys.stdin.readline, ''):
                 newitensXDset = [x[1] if y == x[0] else x[0] if y == x[1] else y for y in newitensXDset]
             newitensXDset = [sorted(newitensXDset), itensXDset[1]]
             newitensXDsets.append(newitensXDset)
-        newitensXDsets = sorted(newitensXDsets, key = lambda x: (len(x[0]), operator.itemgetter(*range(len(x[0])))(x[0])))
-        
-        if (newSRsets == SRsets) or (newitensXDsets == itensXDsets):
+        newitensXDsets = sorted(newitensXDsets, key = lambda x: [x[i] for i in range(len(x))])
+
+        SRinvol = (newSRsets == SRsets)
+        itensXDinvol = (newitensXDsets == itensXDsets)
+        if SRinvol or itensXDinvol:
             matinvol = "{" + ",".join([",".join(["D" + str(x[0] + 1) + "->D" + str(x[1] + 1), "D" + str(x[1] + 1) + "->D" + str(x[0] + 1)]) for x in invol]) + "}"
-            SRinvol = (newSRsets == SRsets)
-            itensXDinvol = (newitensXDsets == itensXDsets)
             involquery = {"POLYID": triang_doc['POLYID'], "GEOMN": triang_doc['GEOMN'], "TRIANGN": triang_doc['TRIANGN'], "INVOLN": involn}
-            newinvolout = {"H11": triang_doc['H11'], "POLYID": triang_doc['POLYID'], "GEOMN": triang_doc['GEOMN'], "TRIANGN": triang_doc['TRIANGN'], "INVOLN": involn, "INVOL": matinvol, "INVOLDIVCOHOM": [py2mat(divcohom[x[0]]) for x in invol], "SRINVOL": SRinvol, "ITENSXDINVOL": itensXDinvol}
+            newinvolout = {"isINVOL": True, "H11": triang_doc['H11'], "POLYID": triang_doc['POLYID'], "GEOMN": triang_doc['GEOMN'], "TRIANGN": triang_doc['TRIANGN'], "INVOLN": involn, "INVOL": matinvol, "INVOLDIVCOHOM": [py2mat(divcohom[x[0]]) for x in invol], "SRINVOL": SRinvol, "ITENSXDINVOL": itensXDinvol}
             print("set INVOL " + json.dumps(involquery, separators = (',', ':')) + " " + json.dumps(newinvolout, separators = (',', ':')))
             sys.stdout.flush()
+            #allowedinvols.append(newinvolout)
             involn += 1
     involn -= 1
 

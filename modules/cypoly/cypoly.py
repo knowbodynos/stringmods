@@ -1,5 +1,3 @@
-#!/shared/apps/sage/sage-5.12/spkg/bin/sage -python
-
 from sage.all_cmdline import *
 from sage.schemes.toric.variety import normalize_names
 from sage.rings.polynomial.polydict import PolyDict
@@ -18,12 +16,82 @@ from time import time
 import json
 from random import randint
 from collections import defaultdict
-import mongojoin.tools as tools
-import mongojoin.parse as parse
-from mongojoin.parse import pythonlist2mathematicalist as py2mat
-from mongojoin.parse import mathematicalist2pythonlist as mat2py
 import sys
 import re
+from sympy.combinatorics import Permutation
+
+def deldup(lst):
+    "Delete duplicate elements in lst."
+    return [lst[i] for i in range(len(lst)) if lst[i] not in lst[:i]]
+
+def transpose_list(lst):
+    "Get the transpose of a list of lists."
+    try:
+        if len(lst) == 0:
+            raise IndexError('List is empty.')
+        elif not all([len(x) == len(lst[0]) for x in lst]):
+            raise IndexError('Lists have different sizes.')
+        else:
+            return [[lst[i][j] for i in range(len(lst))] for j in range(len(lst[0]))]
+    except IndexError:
+        return []
+
+def mat2py(mat):
+    py = mat.replace('{', '[').replace('}', ']')
+    return eval(py)
+
+def py2mat(py):
+    mat = str(py).replace(' ', '').replace('[', '{').replace(']', '}')
+    return mat
+
+def cycle(arr, orig = None):
+    if arr == orig:
+        return []
+    if not orig:
+        orig = arr
+    new_arr = arr[:]
+    new_arr.append(new_arr.pop(0))
+    return [arr] + cycle(new_arr, orig = orig)
+
+def is_same_parity(perm0, perm1):
+    """Check if 2 permutations are of equal parity.
+
+    Assume that both permutation lists are of equal length
+    and have the same elements. No need to check for these
+    conditions.
+    """
+    perm1 = perm1[:] ## copy this list so we don't mutate the original
+
+    transCount = 0
+    for loc in range(len(perm0) - 1):                         # Do (len - 1) transpositions
+        p0 = perm0[loc]
+        p1 = perm1[loc]
+        if p0 != p1:
+            sloc = perm1[loc:].index(p0) + loc          # Find position in perm1
+            perm1[loc], perm1[sloc] = p0, p1          # Swap in perm1
+            transCount += 1
+
+    # Even number of transpositions means equal parity
+    if transCount % 2 == 0:
+        return True
+    else:
+        return False
+
+def volform_parity(ndivs, invol):
+    order = list(range(ndivs))
+    for x, y in invol:
+        temp = order[x]
+        order[x] = order[y]
+        order[y] = temp
+    perm = Permutation(order)
+    cycles = cycle(list(range(ndivs)))
+    volform_term_parities = [is_same_parity(cycles[i][1:], [i^perm for i in cycles[i^perm][1:]]) for i in range(ndivs)]
+    if all(x for x in volform_term_parities):
+        return 1
+    elif all(not x for x in volform_term_parities):
+        return -1
+    else:
+        return 0
     
 def inv(invol, poly, pr):
     """Returns the polynomial after being acted on by invol"""
@@ -2012,44 +2080,44 @@ def divisor_case_Xs(rwmat, invol, bi, c, o7Charges, fsets):
 
 def read_JSON(string):
     """Reads in results as a JSON string, returns a dict of which the properties are the values."""
-    string.replace("{","[")
-    string.replace("}","]")
+    string.replace("{", "[")
+    string.replace("}", "]")
     string = string.split('\'')
     string = '\"'.join(string)
     return json.loads(string)
 
 #Hodge splitting
 def hodgesplit(h11, h21, invol, basisinds, dresverts):
-    R=PolynomialRing(QQ,['t'+str(i+1) for i in range(len(basisinds))]+['D'+str(i+1) for i in range(len(dresverts))]+['Ep'+str(i+1) for i in range(len(invol))]+['Em'+str(i+1) for i in range(len(invol))]+['J'+str(i+1) for i in range(len(basisinds))]);
-    vars=R.gens_dict();
-    Ilin=R.ideal([sum([dresverts[i][j]*vars['D'+str(i+1)] for i in range(len(dresverts))]) for j in range(len(dresverts[0]))]);
-    Isplit=R.ideal([z for y in [[2*vars['D'+str(invol[i][0]+1)]-(vars['Ep'+str(i+1)]+vars['Em'+str(i+1)]),2*vars['D'+str(invol[i][1]+1)]-(vars['Ep'+str(i+1)]-vars['Em'+str(i+1)])] for i in range(len(invol))] for z in y]);
-    Ibasisinds=R.ideal([vars['D'+str(basisinds[i]+1)]-vars['J'+str(i+1)] for i in range(len(basisinds))]);
-    hysurf=sum([vars['D'+str(i+1)] for i in range(len(dresverts))]);
-    hyideal=(Ilin+Ibasisinds).quotient(R.ideal(hysurf));
-    J=sum([vars['t'+str(i+1)]*vars['D'+str(basisinds[i]+1)] for i in range(len(basisinds))]);
-    Jreduced=J.reduce(Ilin+Isplit);
-    Isym=R.ideal([y for y in [Jreduced.coefficient(vars['Em'+str(i+1)]) for i in range(len(invol))] if y!=0]);
-    symJ=Jreduced.reduce(Isym);
-    symJcoefficients=tools.transpose_list([y for y in [[symJ.coefficient(vars['Ep'+str(i+1)]),(vars['D'+str(invol[i][0]+1)]+vars['D'+str(invol[i][1]+1)]).reduce(hyideal)] for i in range(len(invol))]+[[symJ.coefficient(vars['D'+str(i+1)]),vars['D'+str(i+1)].reduce(hyideal)] for i in range(len(dresverts))] if y[0]!=0]);
-    Iasym=R.ideal([y for y in [Jreduced.coefficient(vars['Ep'+str(i+1)]) for i in range(len(invol))] if y!=0]);
-    asymJ=Jreduced.reduce(Iasym);
-    asymJcoefficients=tools.transpose_list([y for y in [[asymJ.coefficient(vars['Em'+str(i+1)]),(vars['D'+str(invol[i][0]+1)]-vars['D'+str(invol[i][1]+1)]).reduce(hyideal)] for i in range(len(invol))] if y[0]!=0]);
-    symh11=len(symJcoefficients[0]);
-    symh21=symh11-((h11-h21)/2)
-    h11split=[symh11,h11-symh11];
-    h21split=[symh21,h21-symh21];
-    return [h11split,h21split,symJcoefficients,asymJcoefficients];
+    R = PolynomialRing(QQ, ['t' + str(i + 1) for i in range(len(basisinds))] + ['D' + str(i + 1) for i in range(len(dresverts))] + ['Ep' + str(i + 1) for i in range(len(invol))] + ['Em' + str(i + 1) for i in range(len(invol))] + ['J' + str(i + 1) for i in range(len(basisinds))])
+    vars = R.gens_dict()
+    Ilin = R.ideal([sum([dresverts[i][j] * vars['D' + str(i + 1)] for i in range(len(dresverts))]) for j in range(len(dresverts[0]))])
+    Isplit = R.ideal([z for y in [[2 * vars['D' + str(invol[i][0] + 1)] - (vars['Ep' + str(i + 1)] + vars['Em' + str(i + 1)]), 2 * vars['D' + str(invol[i][1] + 1)] - (vars['Ep' + str(i + 1)] - vars['Em' + str(i + 1)])] for i in range(len(invol))] for z in y])
+    Ibasisinds = R.ideal([vars['D' + str(basisinds[i] + 1)] - vars['J' + str(i + 1)] for i in range(len(basisinds))])
+    hysurf = sum([vars['D' + str(i + 1)] for i in range(len(dresverts))])
+    hyideal = (Ilin + Ibasisinds).quotient(R.ideal(hysurf))
+    J = sum([vars['t' + str(i + 1)] * vars['D' + str(basisinds[i] + 1)] for i in range(len(basisinds))])
+    Jreduced = J.reduce(Ilin + Isplit)
+    Isym = R.ideal([y for y in [Jreduced.coefficient(vars['Em' + str(i + 1)]) for i in range(len(invol))] if y != 0])
+    symJ = Jreduced.reduce(Isym)
+    symJcoefficients = transpose_list([y for y in [[symJ.coefficient(vars['Ep' + str(i + 1)]), (vars['D' + str(invol[i][0] + 1)] + vars['D' + str(invol[i][1] + 1)]).reduce(hyideal)] for i in range(len(invol))] + [[symJ.coefficient(vars['D' + str(i + 1)]), vars['D' + str(i + 1)].reduce(hyideal)] for i in range(len(dresverts))] if y[0] != 0])
+    Iasym = R.ideal([y for y in [Jreduced.coefficient(vars['Ep' + str(i + 1)]) for i in range(len(invol))] if y != 0])
+    asymJ = Jreduced.reduce(Iasym)
+    asymJcoefficients = transpose_list([y for y in [[asymJ.coefficient(vars['Em' + str(i + 1)]), (vars['D' + str(invol[i][0] + 1)] - vars['D' + str(invol[i][1] + 1)]).reduce(hyideal)] for i in range(len(invol))] if y[0] != 0])
+    symh11 = len(symJcoefficients[0])
+    symh21 = symh11 - ((h11 - h21) / 2)
+    h11split = [symh11, h11 - symh11]
+    h21split = [symh21, h21 - symh21]
+    return [h11split, h21split, symJcoefficients, asymJcoefficients]
     
 def allbaseshodgesplit(h11, h21, invol, basisinds, dresverts, rwmat):
-    bases=[x for x in Combinations(range(len(dresverts)),matrix(rwmat).rank()).list() if matrix([rwmat[i] for i in x]).rank()==matrix(rwmat).rank()];
-    result0=[hodgesplit(h11,h21,invol,x,dresverts,rwmat) for x in [basisinds]+bases];
-    result1=[[x[0],x[1]] for x in result0];
-    result=[all([x==result1[0] for x in result1])];
-    result.extend([result0[0][0],result0[0][1],result0[0][2][1],result0[0][3][1]]);
-    return result;
+    bases = [x for x in Combinations(range(len(dresverts)), matrix(rwmat).rank()).list() if matrix([rwmat[i] for i in x]).rank() == matrix(rwmat).rank()]
+    result0 = [hodgesplit(h11, h21, invol, x, dresverts, rwmat) for x in [basisinds] + bases]
+    result1 = [[x[0], x[1]] for x in result0]
+    result = [all([x == result1[0] for x in result1])]
+    result.extend([result0[0][0], result0[0][1], result0[0][2][1], result0[0][3][1]])
+    return result
 
-def main_one(polyid, geonum, trinum, invnum, invol, rwmat):
+def main_one(polyid, geonum, trinum, invnum, invol, rwmat, algorithm = None):
     """Runs the entire routine for a single example."""
 
     # DATA FROM POLYID, GEONUM, TRINUM
@@ -2057,25 +2125,26 @@ def main_one(polyid, geonum, trinum, invnum, invol, rwmat):
     trikey = "TRIANGN"
     geokey = "GEOMN"
     invkey = "INVOLN"
-    #norigcykey = "NCYTERMS"
-    #nsymcykey = "NSYMCYTERMS"
+    # norigcykey = "NCYTERMS"
+    # nsymcykey = "NSYMCYTERMS"
     origcykey = "CYPOLY"
     symcykey = "SYMCYPOLY"
-    #oplaneskey = "OPLANES"
-    #odimkey = "ODIM"
-    #oidealkey = "OIDEAL"
+    # oplaneskey = "OPLANES"
+    # odimkey = "ODIM"
+    # oidealkey = "OIDEAL"
     #o7key = "O7"
     #o5key = "O5"
     #o3key = "O3"
     #o1key = "O1"
     #otherkey = "OTHER"
     #allbaseskey = "ALLBASES"
-    #h11pluskey = "H11+"
-    #h21pluskey = "H21+"
-    #h11minuskey = "H11-"
-    #h21minuskey = "H21-"
+    # h11pluskey = "H11+"
+    # h21pluskey = "H21+"
+    # h11minuskey = "H11-"
+    # h21minuskey = "H21-"
     #h11splitkey = "H11SPLIT"
     #h21splitkey = "H21SPLIT"
+    # vformparitykey = "VOLFORMPARITY"
 
     # # # First off, we need to reformat the SR ideal, the RWM, and the basis into the appropriate forms
     # # # Let's start with the SR ideal
@@ -2125,15 +2194,15 @@ def main_one(polyid, geonum, trinum, invnum, invol, rwmat):
     # Split based on whether there are anti-invariant monomials or not
     q = len(polys)
     if q > k:
-        #ci, ni, rwn, rwnFull = new_rwmat(rwmat, invol, polys)
+        # ci, ni, rwn, rwnFull = new_rwmat(rwmat, invol, polys)
         #print(rwn)
-        #ai = anti_invariant_monomials(rwmat, invol, polys, ni)
-        #fsets, fsetsx = fixed_flip(rwmat, ni, ai, polys, sr, rwn, algorithm=algorithm)
+        # ai = anti_invariant_monomials(rwmat, invol, polys, ni)
+        # fsets, fsetsx = fixed_flip(rwmat, ni, ai, polys, sr, rwn, algorithm=algorithm)
         #print(fsets)
 #        prx = PolynomialRing(base_ring=ZZ, names=normalize_names('x+', n)) #Old Version
         prx = PolynomialRing(base_ring=QQ, names=normalize_names('x+', n))
 #        pry = PolynomialRing(base_ring=ZZ, names=names_list(rwn, ni)) #Old Version
-        #pry = PolynomialRing(base_ring=QQ, names=names_list(rwn, ni))
+        # pry = PolynomialRing(base_ring=QQ, names=names_list(rwn, ni))
         charges = cy_charges(rwmat)
         #charges = [charges[i] for i in range(len(charges)) if i in ci]
 
@@ -2143,55 +2212,55 @@ def main_one(polyid, geonum, trinum, invnum, invol, rwmat):
         # cypoly = poly_ytox(cypoly, polys, prx, pry, ni)
         origcypoly = general_poly(rwmat, charges, pr=prx)
         origcypolyterms=origcypoly.monomials()
-        #norigcypolyterms = len(origcypolyterms)
+        # norigcypolyterms = len(origcypolyterms)
 
         while True:
             try:
                 symcypoly = symm_poly_swap(origcypoly, invol, prx)
                 symcypolyterms = symcypoly.monomials()
-                #nsymcypolyterms = len(symcypolyterms)
-                #pr = prx
+                # nsymcypolyterms = len(symcypolyterms)
+                # pr = prx
 
                 # Sort the fixed sets into O7, O5, O3, O1 by finding the codimension
                 #print("Unreduced fsets", fsets)
-                #frs = []
-                #fsets2 = []
-                #for i in range(len(fsets)):
-                #    fset = fsets[i]
-                #    #print(fset)
-                #    fsetx = fsetsx[i]
-                #    fset, fr = fset_reduced(prx, fset, sr, symcypoly, polys, ni, rwn, algorithm=algorithm)
-                #    fsets2.append(fset)
-                #    frs.append(fr)
+                # frs = []
+                # fsets2 = []
+                # for i in range(len(fsets)):
+                #     fset = fsets[i]
+                #     #print(fset)
+                #     fsetx = fsetsx[i]
+                #     fset, fr = fset_reduced(prx, fset, sr, symcypoly, polys, ni, rwn, algorithm=algorithm)
+                #     fsets2.append(fset)
+                #     frs.append(fr)
             except:
                 continue
             else:
                 break
 
-        ## Remove redundant fixed sets
-        #remove = []
-        #for p1 in range(len(frs)):
-        #    if frs[p1] == None:
-        #        continue
-        #    for p2 in range(len(frs)):
-        #        if frs[p2] == None:
-        #            continue
-        #        if sublist_of(frs[p1], frs[p2]) and p1 != p2:
-        #            remove.append(p2)
-        #fsets2 = [fsets2[w] for w in range(len(fsets2)) if w not in remove]
-        #frs = [frs[w] for w in range(len(frs)) if w not in remove]
+        # Remove redundant fixed sets
+        # remove = []
+        # for p1 in range(len(frs)):
+        #     if frs[p1] == None:
+        #         continue
+        #     for p2 in range(len(frs)):
+        #         if frs[p2] == None:
+        #             continue
+        #         if sublist_of(frs[p1], frs[p2]) and p1 != p2:
+        #             remove.append(p2)
+        # fsets2 = [fsets2[w] for w in range(len(fsets2)) if w not in remove]
+        # frs = [frs[w] for w in range(len(frs)) if w not in remove]
 
-        #for i in range(len(frs)):
-        #    fr = frs[i]
-        #    fset = fsets2[i]
-        #    fsetx = copy.deepcopy(fsets2[i])
+        # for i in range(len(frs)):
+        #     fr = frs[i]
+        #     fset = fsets2[i]
+        #     fsetx = copy.deepcopy(fsets2[i])
 
-        #    if (fsetx, fr) == (None, None):
-        #        continue
+        #     if (fsetx, fr) == (None, None):
+        #         continue
 
-        #    codim = len(fr)
+        #     codim = len(fr)
             #On = 'O'+str(9-(2*codim))
-        #    odim = 9-(2*codim)
+            # odim = 9-(2*codim)
             #if codim == 1:
             #    o7.append(fsetx)
             #    o7red.append(fr)
@@ -2207,15 +2276,15 @@ def main_one(polyid, geonum, trinum, invnum, invol, rwmat):
             #else:
             #    other.append(fsetx)
             #    otherred.append(fr)
-        #    oplane = {odimkey:odim, oidealkey:fsetx}
-        #    oplanes.append(oplane)
+            # oplane = {odimkey:odim, oidealkey:fsetx}
+            # oplanes.append(oplane)
             #if On in oplanes.keys():
             #    oplanes[On].append({oidealkey:fsetx,tjurinakey:tjurina})
             #else:
             #    oplanes[On] = [{oidealkey:fsetx,tjurinakey:tjurina}]
 
-        #    oplanered = {odimkey:odim, oidealkey:fr}
-        #    oplanesred.append(oplanered)
+            # oplanered = {odimkey:odim, oidealkey:fr}
+            # oplanesred.append(oplanered)
             #if On in oplanesred.keys():
             #    oplanesred[On].append({oidealkey:fr,tjurinakey:tjurinared})
             #else:
@@ -2223,65 +2292,65 @@ def main_one(polyid, geonum, trinum, invnum, invol, rwmat):
     else:
 #        pr = PolynomialRing(base_ring=ZZ, names=normalize_names('x+', n)) #Old Version
         pr = PolynomialRing(base_ring=QQ, names=normalize_names('x+', n))
-        #ni = [w for b in invol for w in b]
-        #fsets = fixed_swap(rwmat, invol, polys, ni, sr)
+        # ni = [w for b in invol for w in b]
+        # fsets = fixed_swap(rwmat, invol, polys, ni, sr)
         charges = cy_charges(rwmat)
         rwmat = np.matrix(rwmat)
 
         # Use the most general poly for now
         origcypoly = general_poly(rwmat, charges, pr=pr)
         origcypolyterms=origcypoly.monomials()
-        #norigcypolyterms = len(origcypolyterms)
+        # norigcypolyterms = len(origcypolyterms)
 
         while True:
             try:
                 symcypoly = symm_poly_swap(origcypoly, invol, pr)
                 symcypolyterms = symcypoly.monomials()
-                #nsymcypolyterms = len(symcypolyterms)
+                # nsymcypolyterms = len(symcypolyterms)
                 #print(cypoly1)
                 #print(cypoly)
                 #print(cypoly1 - cypoly)
-                #rwn = None
-                #rwnFull = rwmat
+                # rwn = None
+                # rwnFull = rwmat
 
                 # Sort the fixed sets into O7, O5, O3, O1 by finding the codimension
                 #print("Unreduced fsets", fsets)
-                #frs = []
-                #fsets2 = []
-                #for i in range(len(fsets)):
-                #    fset = fsets[i]
-                #    #print(fset)
-                #    fset, fr = fset_reduced(pr, fset, sr, symcypoly, polys, ni, rwn, algorithm=algorithm)
-                #    fsets2.append(fset)
-                #    frs.append(fr)
+                # frs = []
+                # fsets2 = []
+                # for i in range(len(fsets)):
+                #     fset = fsets[i]
+                    #print(fset)
+                    # fset, fr = fset_reduced(pr, fset, sr, symcypoly, polys, ni, rwn, algorithm=algorithm)
+                    # fsets2.append(fset)
+                    # frs.append(fr)
             except:
                 continue
             else:
                 break
 
         # Remove redundant fixed sets
-        #remove = []
-        #for p1 in range(len(frs)):
-        #    if frs[p1] == None:
-        #        continue
-        #    for p2 in range(len(frs)):
-        #        if frs[p2] == None:
-        #            continue
-        #        if sublist_of(frs[p1], frs[p2]) and p1 != p2:
-        #            remove.append(p2)
-        #fsets2 = [fsets2[w] for w in range(len(fsets2)) if w not in remove]
-        #frs = [frs[w] for w in range(len(frs)) if w not in remove]
+        # remove = []
+        # for p1 in range(len(frs)):
+        #     if frs[p1] == None:
+        #         continue
+        #     for p2 in range(len(frs)):
+        #         if frs[p2] == None:
+        #             continue
+        #         if sublist_of(frs[p1], frs[p2]) and p1 != p2:
+        #             remove.append(p2)
+        # fsets2 = [fsets2[w] for w in range(len(fsets2)) if w not in remove]
+        # frs = [frs[w] for w in range(len(frs)) if w not in remove]
 
-        #for i in range(len(frs)):
-        #    fr = frs[i]
-        #    fset = fsets2[i]
+        # for i in range(len(frs)):
+        #     fr = frs[i]
+        #     fset = fsets2[i]
 
-        #    if (fset, fr) == (None, None):
-        #        continue
+        #     if (fset, fr) == (None, None):
+        #         continue
 
-        #    codim = len(fr)
+        #     codim = len(fr)
             #On = 'O'+str(9-(2*codim))
-        #    odim = 9-(2*codim)
+            # odim = 9-(2*codim)
             #if codim == 1:
             #    o7.append(fset)
             #    o7red.append(fr)
@@ -2294,15 +2363,15 @@ def main_one(polyid, geonum, trinum, invnum, invol, rwmat):
             #elif codim == 4:
             #    o1.append(fset)
             #    o1red.append(fr)
-        #    oplane = {odimkey:odim, oidealkey:fset}
-        #    oplanes.append(oplane)
+            # oplane = {odimkey:odim, oidealkey:fset}
+            # oplanes.append(oplane)
             #if On in oplanes.keys():
             #    oplanes[On].append({oidealkey:fset,tjurinakey:tjurina})
             #else:
             #    oplanes[On] = [{oidealkey:fset,tjurinakey:tjurina}]
 
-        #    oplanered = {odimkey:odim, oidealkey:fr}
-        #    oplanesred.append(oplanered)
+            # oplanered = {odimkey:odim, oidealkey:fr}
+            # oplanesred.append(oplanered)
             #if On in oplanesred.keys():
             #    oplanesred[On].append({oidealkey:fr,tjurinakey:tjurinared})
             #else:
@@ -2336,13 +2405,13 @@ def main_one(polyid, geonum, trinum, invnum, invol, rwmat):
     #    oplaneval = oplanes[key]
     #    for i in range(len(oplaneval)):
     #      fset = oplaneval[i][oidealkey]
-    #for i in range(len(oplanes)):
-    #    fset = oplanes[i][oidealkey]
-    #    for j in range(len(fset)):
-    #        w = prn(fset[j])
-    #        w = w(pt)
-    #        fset[j] = py2mat(prn(w))
-    #    oplanes[i][oidealkey] = fset
+    # for i in range(len(oplanes)):
+    #     fset = oplanes[i][oidealkey]
+    #     for j in range(len(fset)):
+    #         w = prn(fset[j])
+    #         w = w(pt)
+    #         fset[j] = py2mat(prn(w))
+    #     oplanes[i][oidealkey] = fset
             #oplaneval[i][oidealkey] = fset
         #oplanes.update({key:oplaneval})
 
@@ -2350,18 +2419,19 @@ def main_one(polyid, geonum, trinum, invnum, invol, rwmat):
     #    oplaneredval = oplanesred[key]
     #    for i in range(len(oplaneredval)):
     #        fset = oplaneredval[i][oidealkey]
-    #for i in range(len(oplanesred)):
-    #    fset = oplanesred[i][oidealkey]
-    #    for j in range(len(fset)):
-    #        w = prn(fset[j])
-    #        w = w(pt)
-    #        fset[j] = py2mat(prn(w))
-    #    oplanesred[i][oidealkey] = fset
+    # for i in range(len(oplanesred)):
+    #     fset = oplanesred[i][oidealkey]
+    #     for j in range(len(fset)):
+    #         w = prn(fset[j])
+    #         w = w(pt)
+    #         fset[j] = py2mat(prn(w))
+    #     oplanesred[i][oidealkey] = fset
     #        oplaneredval[i][oidealkey] = fset
     #    oplanesred.update({key:oplaneredval})
 
     #allbases,h11split,h21split,symbasis,asymbasis=allbaseshodgesplit(h11,h21,invol,basisinds,dresverts,np.transpose(rwmat).tolist())
-    #h11split,h21split,symJcoeffs,asymJcoeffs=hodgesplit(h11,h21,invol,basisinds,dresverts)
+    # h11split, h21split, symJcoeffs, asymJcoeffs = hodgesplit(h11, h21, invol, basisinds, dresverts)
+    # vform_parity = volform_parity(rwmat.shape[1], invol)
     query = {}
     query[polykey] = polyid
     query[geokey] = geonum
@@ -2380,17 +2450,18 @@ def main_one(polyid, geonum, trinum, invnum, invol, rwmat):
     #if len(other)>0:
     #    output[otherkey] = py2mat(other)
     #output = dict([(x[0],py2mat(x[1])) for x in oplanesred.items()])
-    #output = {oplaneskey:oplanesred}
+    # output = {oplaneskey: oplanesred}
     output = {}
     #output[allbaseskey] = allbases
     #output[h11splitkey] = py2mat(h11split)
     #output[h21splitkey] = py2mat(h21split)
-    #output[h11pluskey], output[h11minuskey] = h11split
-    #output[h21pluskey], output[h21minuskey] = h21split
+    # output[h11pluskey], output[h11minuskey] = h11split
+    # output[h21pluskey], output[h21minuskey] = h21split
     output[origcykey] = origcypolyterms
-    #output[norigcykey] = norigcypolyterms
+    # output[norigcykey] = norigcypolyterms
     output[symcykey] = symcypolyterms
-    #output[nsymcykey] = nsymcypolyterms
+    # output[nsymcykey] = nsymcypolyterms
+    # output[vformparitykey] = vform_parity
 
     # Reindex invol to match the database/Mathematica format
     #invol = [[w+1 for w in f] for f in invol]
@@ -2475,34 +2546,54 @@ def main_all(filename, tofile):
 #with open(docsfile,"r") as docstream:
 #    for line in docstream:
 #@wrap()
-#def main(involdoc,algorithm=None):
+#def main(invol_doc,algorithm=None):
 #docsfile=sys.argv[1];
 #basecoll=sys.argv[2];
 #dbindexes=sys.argv[3:];
 #with open(docsfile,'r') as docstream:
 #    for line in docstream:
-for line in iter(sys.stdin.readline,''):
-    involdoc = json.loads(line)
-    #print(involdoc)
-    polyid = involdoc['POLYID']
-    geonum = involdoc['GEOMN']
-    trinum = involdoc['TRIANGN']
-    invnum = involdoc['INVOLN']
-    #h11 = involdoc['H11']
-    #h21 = involdoc['H21']
-    invol = involdoc['INVOL']
-    #basis = involdoc['BASIS']
-    #dresverts = mat2py(involdoc['DRESVERTS'])
-    #sr = involdoc['SRIDEAL']
-    rwmat = involdoc['RESCWS']
+for line in iter(sys.stdin.readline, ''):
+    invol_doc = json.loads(line.rstrip("\n"))
+    #main_all("h114.txt", "h114-results-vF.txt")
 
-    invol = tools.deldup([sorted([y-1 for y in x]) for x in mat2py(re.sub("D([0-9]+)->D([0-9]+)",r"[\1,\2]",invol))])
-    #basisinds = [x-1 for x in tools.transpose_list(mat2py(re.sub("[JD]","",basis)))[1]]
-    #sr = [[y-1 for y in eval(("["+x+"]").replace("D","").replace("*",","))] for x in sr.lstrip("{").rstrip("}").split(",")]
+    #_ = singular.LIB("sing.lib")
+
+    # FOR LOCAL TEST
+    #invol_doc = {"DRESVERTS":"{{-1,-1,-1,0},{-1,-1,-1,1},{-1,-1,0,0},{-1,0,-1,1},{0,-1,0,0},{0,0,-1,0},{2,2,2,-1}}","TRIANGN":1,"POLYID":87,"H11":3,"BASIS":"{{J1,D5},{J2,D6},{J3,D7}}","H21":72,"RESCWS":"{{0,1,1},{1,0,1},{1,0,0},{0,1,0},{0,1,0},{1,0,0},{1,1,1}}","INVOLN":1,"GEOMN":1,"SRIDEAL":"{D3*D6,D4*D5,D1*D2*D7}","INVOL":"{D1->D2,D2->D1}"}
+    #invol_doc = {"DRESVERTS":"{{-1,0,0,0},{-1,0,0,1},{-1,0,2,0},{-1,4,-2,-1},{1,-1,0,0},{-1,0,1,0},{-1,2,-1,0}}","TRIANGN":1,"POLYID":147,"H11":3,"BASIS":"{{J1,D3},{J2,D4},{J3,D7}}","H21":83,"RESCWS":"{{0,0,1},{0,1,1},{0,0,1},{0,1,1},{2,4,4},{1,2,0},{1,0,0}}","INVOLN":2,"GEOMN":1,"SRIDEAL":"{D1*D3,D2*D4,D5*D6*D7}","INVOL":"{D1->D2,D2->D1,D3->D4,D4->D3}"}
+    #invol_doc = read_JSON(str(invol_doc))
+
+    #invol_doc = json.loads(line.rstrip("\n"))
+
+    polyid = invol_doc['POLYID']
+    geonum = invol_doc['GEOMN']
+    trinum = invol_doc['TRIANGN']
+    invnum = invol_doc['INVOLN']
+    # h11 = invol_doc['H11']
+    # h21 = invol_doc['H21']
+    invol = invol_doc['INVOL']
+    # basis = invol_doc['BASIS']
+    # dresverts = mat2py(invol_doc['DRESVERTS'])
+    # sr = invol_doc['SRIDEAL']
+    rwmat = invol_doc['RESCWS']
+
+    invol = deldup([sorted([y - 1 for y in x]) for x in mat2py(re.sub("D([0-9]+)->D([0-9]+)", r"[\1,\2]", invol))])
+    # basisinds = [x - 1 for x in transpose_list(mat2py(re.sub("[JD]", "", basis)))[1]]
+    # sr = [[y - 1 for y in eval(("[" + x + "]").replace("D", "").replace("*", ","))] for x in sr.lstrip("{").rstrip("}").split(",")]
     rwmat = np.array(mat2py(rwmat))
 
-    query, output = main_one(polyid, geonum, trinum, invnum, invol, rwmat)
+    rand = randint(0, 1)
+    if rand == 0:
+        algorithm = 'libsingular:groebner'
+    elif rand == 1:
+        algorithm = 'macaulay2:gb'
+    
+    #query, output = main_one_check(polyid, geonum, trinum, invnum, h11, h21, invol, basisinds, dresverts, sr, rwmat, algorithm=algorithm)
+    query, output = main_one(polyid, geonum, trinum, invnum, invol, rwmat, algorithm = algorithm)
 
-    print("+INVOL."+json.dumps(query,separators=(',',':'))+">"+json.dumps(output,separators=(',',':')))
-    print("@")
+    print("set INVOL " + json.dumps(query, separators = (',', ':')) + " " + json.dumps(output, separators = (',', ':')))
+    print("")#print("@INVOL."+json.dumps(dict([(x,invol_doc[x]) for x in dbindexes]),separators=(',',':')))
     sys.stdout.flush()
+
+#if __name__ == "__main__":
+#    main(algorithm='libsingular:stdfglm')#libsingular:groebner')#macaulay2:gb')
