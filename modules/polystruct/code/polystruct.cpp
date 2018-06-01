@@ -298,7 +298,7 @@ int main(int argc, char* argv[]) {
             out_doc["CONETOFACE"] = face3d_id_to_faces2d_ids;
             out_doc["FACETOCONE"] = face2d_id_to_faces3d_ids;
 
-            std::cout << "set POLYSTRUCT ";
+            std::cout << "set POLY ";
             writer->write(index_doc, &std::cout);
             std::cout << " ";
             writer->write(out_doc, &std::cout);
