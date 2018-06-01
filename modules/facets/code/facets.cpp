@@ -708,7 +708,7 @@ string col_to_string(const PolyMatrix&pm, const int& i) {
 	return vstr;
 }
 
-string polymat_to_string(const PolyMatrix& pm) {
+string intmat_to_string(const PolyMatrix& pm) {
 	string pmstr = "{";
 	for (int i = 0; i < pm.cols()-1; i++) {
 		pmstr += col_to_string(pm, i);
@@ -938,7 +938,7 @@ int main(int argc, char** argv) {
 
 			cout << "The normal form is:" << endl;
 			cout << p.normal_form() << endl;
-			cout << "or in string form: " << polymat_to_string(p.normal_form()) << endl;
+			cout << "or in string form: " << intmat_to_string(p.normal_form()) << endl;
 		
 
 			cout << "The Hodge numbers are:" << endl;
@@ -955,7 +955,7 @@ int main(int argc, char** argv) {
 		PolyMatrix nf = p.normal_form();
 		cout << "The normal form is:" << endl;
 		cout << nf << endl;
-		cout << "or in string form: " << polymat_to_string(nf) << endl;
+		cout << "or in string form: " << intmat_to_string(nf) << endl;
 
 		cout << "The boundary points are:" << endl;
 		cout << p.boundary_points() << endl;
@@ -1010,7 +1010,7 @@ int main(int argc, char** argv) {
 			if (dp.is_reflexive()) {
 				cout << "The dual normal form is:" << endl;
 				cout << dp.normal_form() << endl;
-				cout << "or in string form: " << polymat_to_string(dp.normal_form()) << endl;
+				cout << "or in string form: " << intmat_to_string(dp.normal_form()) << endl;
 			
 
 				cout << "The dual Hodge numbers are:" << endl;
@@ -1021,10 +1021,10 @@ int main(int argc, char** argv) {
 			*/
 
 			//cout << "The vertices of dp are:" << endl;
-			cout << "set POLY {\"POLYID\":" << polyid << "} {\"DVERTS\":\"" << polymat_to_string(dp.vertices()) << "\",";
+			cout << "set POLY {\"POLYID\":" << polyid << "} {\"DVERTS\":\"" << intmat_to_string(dp.vertices()) << "\",";
 
 			//cout << "The points of the 2-skeleton of dp are:" << endl;
-			cout << "\"DRESVERTS\":\"" << polymat_to_string(dp.p_boundary_points(3)) << "\",";
+			cout << "\"DRESVERTS\":\"" << intmat_to_string(dp.p_boundary_points(3)) << "\",";
 
 			/*
 			cout << "The integral points of dp are: " << endl;
@@ -1116,7 +1116,7 @@ int main(int argc, char** argv) {
 				if (i > 0) {
 					cout << ",";
 				}
-				cout << "{\"NFORM\":\"" << polymat_to_string(nffsuniq[i]) << "\",\"NINST\":" << nffsmult[i] << "}";
+				cout << "{\"NFORM\":\"" << intmat_to_string(nffsuniq[i]) << "\",\"NINST\":" << nffsmult[i] << "}";
 			}
 			cout << "]}";
 
@@ -1124,7 +1124,7 @@ int main(int argc, char** argv) {
 
 			for (int i = 0; i < nffsuniq.size(); i++) {
 				//cout << "=====" << endl;
-				cout << "set FACET {\"NFORM\":\"" << polymat_to_string(nffsuniq[i]) << "\"} {\"NFORM2SKEL\":\"" << polymat_to_string(nf2skelsuniq[i]) << "\",\"facetfinetriangsMARK\":false,\"facetallfinetriangsMARK\":false}" << endl;
+				cout << "set FACET {\"NFORM\":\"" << intmat_to_string(nffsuniq[i]) << "\"} {\"NFORM2SKEL\":\"" << intmat_to_string(nf2skelsuniq[i]) << "\",\"facetfinetriangsMARK\":false,\"facetallfinetriangsMARK\":false}" << endl;
 			}
 
 			cout << endl;

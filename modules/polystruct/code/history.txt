@@ -1,0 +1,1000 @@
+  585  cd ..
+  586  cd ../..
+  587  cd ../modules/
+  588  cd smooth/all/
+  589  crunch re
+  590  crunch reset 
+  591  crunch submit 
+  592  cd /gss_gpfs_scratch/altman.ro/DBCrunch/api/wm/crunch_wm_slurm/
+  593  python setup.py install --user --record filespy.txt
+  594  python
+  595  python setup.py install --user --record filespy.txt
+  596  python
+  597  sage --python setup.py install --user --record filessage.txt
+  598  cd ../../db/crunch_db_mongodb/
+  599  python setup.py install --user --record filespy.txt
+  600  sage --python setup.py install --user --record filessage.txt
+  601  cd ../../crunch_config/
+  602  python setup.py install --user --record filespy.txt
+  603  sage --python setup.py install --user --record filessage.txt
+  604  python
+  605  cd /gss_gpfs_scratch/altman.ro/modules/smooth/a
+  606  cd /gss_gpfs_scratch/altman.ro/modules/smooth/all/
+  607  crunch reset 
+  608  crunch submit 
+  609  djob
+  610  cd /gss_gpfs_scratch/altman.ro/DBCrunch/api/crunch_config/
+  611  python setup.py install --user --record filespy.txt
+  612  sage --python setup.py install --user --record filessage.txt
+  613  cd /gss_gpfs_scratch/altman.ro/modules/smooth/all/
+  614  crunch reset 
+  615  crunch submit 
+  616  djob
+  617  crunch reset 
+  618  crunch submit 
+  619  djob
+  620  crunch reset 
+  621  crunch submit 
+  622  crunch monitor 
+  623  djob
+  624  crunch reset 
+  625  crunch submit 
+  626  crunch monitor 
+  627  djob
+  628  python
+  629  djob
+  630  crunch reset 
+  631  crunch submit 
+  632  crunch monitor 
+  633  djob
+  634  crunch reset 
+  635  crunch submit 
+  636  crunch monitor 
+  637  djob
+  638  crunch reset 
+  639  crunch submit 
+  640  crunch monitor 
+  641  djob
+  642  crunch reset 
+  643  crunch submit 
+  644  crunch monitor 
+  645  djob
+  646  crunch reset 
+  647  crunch submit 
+  648  crunch monitor 
+  649  djob
+  650  crunch reset 
+  651  crunch submit 
+  652  crunch monitor 
+  653  djob
+  654  crunch reset 
+  655  crunch submit 
+  656  djob
+  657  cd ../../cypoly/all/
+  658  crunch reset 
+  659  crunch submit 
+  660  djob
+  661  crunch reset 
+  662  crunch submit 
+  663  crunch monitor 
+  664  cd ../../smooth/all/
+  665  crunch reset 
+  666  crunch submit 
+  667  crunch monitor 
+  668  djob
+  669  crunch reset 
+  670  crunch submit 
+  671  crunch monitor 
+  672  djob
+  673  crunch reset 
+  674  crunch submit 
+  675  crunch monitor 
+  676  djob
+  677  crunch reset 
+  678  crunch submit 
+  679  crunch monitor 
+  680  djob
+  681  cd docs
+  682  python
+  683  cd ..
+  684  crunch reset 
+  685  crunch submit 
+  686  crunch monitor 
+  687  djob
+  688  crunch reset 
+  689  crunch submit 
+  690  crunch monitor 
+  691  djob
+  692  cd ../../cypoly/all/
+  693  crunch reset 
+  694  crunch submit 
+  695  crunch monitor 
+  696  python
+  697  crunch reset 
+  698  djob
+  699  crunch submit 
+  700  crunch monitor 
+  701  /gss_gpfs_scratch/altman.ro/DBCrunch/modules/modules/smooth/smooth.bash 
+  702  pwd
+  703  cd ../../smooth/a
+  704  cd ../../smooth/all/
+  705  crunch reset 
+  706  crunch submit 
+  707  crunch monitor 
+  708  djob
+  709  /gss_gpfs_scratch/altman.ro/DBCrunch/modules/modules/smooth/smooth.bash 
+  710  djob
+  711  crunch reset 
+  712  crunch submit 
+  713  crunch monitor 
+  714  djob
+  715  crunch reset 
+  716  crunch submit 
+  717  crunch monitor 
+  718  sfindpart
+  719  sinteract -e ser-par-10g-4
+  720  cd /gss_gpfs_scratch/altman.ro/modules/smooth/all/
+  721  crunch reset 
+  722  crunch submit 
+  723  crunch monitor 
+  724  sjob
+  725  ssh -X compute-0-145
+  726  cd /gss_gpfs_scratch/altman.ro/modules/smooth/all/
+  727  crunch monitor 
+  728  djob
+  729  crunch reset 
+  730  crunch submit 
+  731  crunch monitor 
+  732  djob
+  733  crunch reset 
+  734  crunch submit 
+  735  crunch monitor 
+  736  djob
+  737  crunch reset 
+  738  crunch submit 
+  739  crunch monitor 
+  740  djob
+  741  crunch reset 
+  742  crunch submit 
+  743  crunch monitor 
+  744  djob
+  745  cd ../..
+  746  crunch template triangpy2mat all
+  747  cd triangpy2mat/all/
+  748  crunch submit 
+  749  crunch monitor 
+  750  djob
+  751  crunch reset 
+  752  crunch submit 
+  753  crunch monitor 
+  754  crunch reset 
+  755  crunch submit 
+  756  crunch monitor 
+  757  crunch reset 
+  758  crunch submit 
+  759  crunch monitor 
+  760  sjob crunch_triangpy2mat_all_controller.job 
+  761  sbatch crunch_triangpy2mat_all_controller.job 
+  762  sjob
+  763  sbatch crunch_triangpy2mat_all_controller.job 
+  764  sjob
+  765  sacct -u altman.ro
+  766  sbatch crunch_triangpy2mat_all_controller.job 
+  767  sacct -u altman.ro
+  768  crunch reset 
+  769  crunch submit 
+  770  sacct -u altman.ro
+  771  crunch reset 
+  772  crunch submit 
+  773  crunch monitor 
+  774  crunch reset 
+  775  crunch submit 
+  776  crunch monitor 
+  777  djob
+  778  cd ../..
+  779  rm -r triangpy2mat
+  780  crunch template triangpy2mat all
+  781  cd triangpy2mat/all/
+  782  crunch submit 
+  783  crunch monitor 
+  784  python
+  785  sacct -u altman.ro
+  786  sacct -u altman.ro -j 14408762
+  787  sacct -u altman.ro -j 14408762 -o "%P"
+  788  sacct -u altman.ro -j 14408762 -l
+  789  man sacct
+  790  sacct -u altman.ro -j 14408762 -o "30%Partition"
+  791  sacct -u altman.ro -j 14408762 -o "Partition%30"
+  792  crunch reset 
+  793  crunch submit 
+  794  sacct -u altman.ro -j 14408762 -o "Partition%30"
+  795  sacct -u altman.ro -j 14408766 -o "Partition%30"
+  796  crunch reset 
+  797  crunch submit 
+  798  sacct -u altman.ro -j 14408767 -o "Partition%30"
+  799  sjob
+  800  ssh -X compute-0-145
+  801  cd /gss_gpfs_scratch/altman.ro/modules/triangpy2mat/all/
+  802  crunch reset 
+  803  crunch submit 
+  804  sjob
+  805  djob
+  806  crunch reset 
+  807  crunch submit 
+  808  sjob
+  809  crunch monitor 
+  810  cd ../../../DBCrunch/api/db/crunch_db_mongodb/
+  811  python setup.py install --user --record filespy.txt
+  812  sage --python setup.py install --user --record filessage.txt
+  813  cd /gss_gpfs_scratch/altman.ro/modules/triangpy2mat/all/
+  814  crunch reset 
+  815  crunch submit 
+  816  crunch monitor 
+  817  crunch reset 
+  818  crunch submit 
+  819  crunch monitor 
+  820  sacct -u altman.ro -j 14410472
+  821  sacct -u altman.ro -j 14410472 -o "Partition%30"
+  822  crunch reset 
+  823  crunch submit 
+  824  crunch monitor 
+  825  sacct -u altman.ro -j 14410491 -o "Partition%30"
+  826  crunch reset 
+  827  crunch submit 
+  828  crunch monitor 
+  829  crunch reset 
+  830  crunch submit 
+  831  sjob
+  832  crunch monitor 
+  833  djob
+  834  crunch reset 
+  835  crunch submit 
+  836  sjob
+  837  crunch submit 
+  838  sjob
+  839  crunch submit 
+  840  sjob
+  841  crunch submit 
+  842  sjob
+  843  crunch submit 
+  844  sjob
+  845  crunch submit 
+  846  sjob
+  847  crunch submit 
+  848  sjob
+  849  crunch submit 
+  850  sjob
+  851  crunch submit 
+  852  sjob
+  853  crunch submit 
+  854  sjob
+  855  crunch submit 
+  856  sjob
+  857  crunch reset 
+  858  crunch submit 
+  859  sjob
+  860  crunch monitor 
+  861  crunch reset 
+  862  crunch submit 
+  863  crunch monitor 
+  864  cd jobs
+  865  sbatch *
+  866  sbatch ./*
+  867  ls
+  868  sbatch crunch_triangpy2mat_all_job_1_steps_1-2.job 
+  869  sjob
+  870  sbatch crunch_triangpy2mat_all_job_1_steps_1-2.job 
+  871  sjob
+  872  sbatch crunch_triangpy2mat_all_job_1_steps_1-2.job 
+  873  sjob
+  874  sbatch crunch_triangpy2mat_all_job_1_steps_1-2.job 
+  875  sjob
+  876  sbatch crunch_triangpy2mat_all_job_1_steps_1-2.job 
+  877  sjob
+  878  sbatch crunch_triangpy2mat_all_job_1_steps_1-2.job 
+  879  sjob
+  880  sbatch crunch_triangpy2mat_all_job_1_steps_1-2.job 
+  881  sjob
+  882  sbatch crunch_triangpy2mat_all_job_1_steps_1-2.job 
+  883  sjob
+  884  cd ../../..
+  885  cd smooth
+  886  crunch reset 
+  887  crunch submit 
+  888  crunch monitor 
+  889  djob
+  890  cd ../..
+  891  cd modules/triangpy2mat/all/
+  892  crunch reset 
+  893  crunch submit 
+  894  crunch monitor 
+  895  crunch reset 
+  896  crunch submit 
+  897  crunch monitor 
+  898  cd /gss_gpfs_scratch/altman.ro/DBCrunch/modules/modules/triangpy2mat/
+  899  ls
+  900  cd triangpy2mat*
+  901  ls triangpy2mat*
+  902  python triangpy2mat.py 
+  903  cd /gss_gpfs_scratch/altman.ro/modules/triangpy2mat/all/
+  904  crunch reset 
+  905  crunch submit 
+  906  crunch monitor 
+  907  djob
+  908  crunch reset 
+  909  crunch submit 
+  910  crunch monitor 
+  911  djob
+  912  crunch reset
+  913  crunch submit 
+  914  crunch monitor 
+  915  crunch reset
+  916  crunch submit 
+  917  djob
+  918  crunch reset
+  919  crunch submit 
+  920  crunch monitor 
+  921  crunch reset
+  922  crunch submit 
+  923  crunch monitor 
+  924  djob
+  925  crunch reset
+  926  crunch monitor 
+  927  djob
+  928  crunch submit 
+  929  crunch monitor 
+  930  sjob
+  931  crunch monitor 
+  932  crunch reset
+  933  crunch submit 
+  934  crunch monitor 
+  935  djob
+  936  crunch reset
+  937  djob
+  938  crunch submit 
+  939  crunch monitor 
+  940  djob
+  941  crunch reset
+  942  crunch submit 
+  943  crunch monitor 
+  944  crunch reset
+  945  crunch submit 
+  946  crunch monitor 
+  947  crunch reset
+  948  crunch submit 
+  949  crunch monitor 
+  950  cd ../../smooth/all/
+  951  crunch reset 
+  952  crunch submit 
+  953  crunch monitor 
+  954  crunch reset 
+  955  crunch submit 
+  956  crunch monitor 
+  957  djob
+  958  crunch reset 
+  959  crunch submit 
+  960  crunch monitor 
+  961  djob
+  962  crunch reset 
+  963  djob
+  964  crunch submit 
+  965  crunch monitor 
+  966  djob
+  967  crunch reset 
+  968  crunch submit 
+  969  crunch monitor 
+  970  djob
+  971  crunch reset 
+  972  crunch submit 
+  973  crunch monitor 
+  974  djob
+  975  crunch reset 
+  976  crunch submit 
+  977  crunch monitor 
+  978  crunch reset 
+  979  crunch submit 
+  980  crunch monitor 
+  981  djob
+  982  crunch reset 
+  983  crunch submit 
+  984  crunch monitor 
+  985  djob
+  986  crunch reset 
+  987  crunch submit 
+  988  crunch monitor 
+  989  crunch reset 
+  990  crunch submit 
+  991  crunch monitor 
+  992  cd $CRUNCH_ROOT/
+  993  git add -A .
+  994  git commit -m "Updated crunch_db_mongodb."
+  995  git push origin master
+  996  cd ../pymongojoin/
+  997  python setup.py install --user --record filespy.txt
+  998  sage --python setup.py install --user --record filessage.txt
+  999  cd /gss_gpfs_scratch/carifio.j/Subcones
+ 1000  ls
+ 1001  cd /gss_gpfs_scratch/altman.ro/pymongojoin/
+ 1002  more .gitignore
+ 1003  python setup.py install --user --record filespy.txt
+ 1004  sage --python setup.py install --user --record filessage.txt
+ 1005  cd ../DBCrunch/api/db/crunch_db_mongodb/
+ 1006  python setup.py install --user --record filespy.txt
+ 1007  sage --python setup.py install --user --record filessage.txt
+ 1008  cd ../../crunch_config/
+ 1009  python setup.py install --user --record filespy.txt
+ 1010  sage --python setup.py install --user --record filessage.txt
+ 1011  cd ../wm/crunch_wm_slurm/
+ 1012  python setup.py install --user --record filespy.txt
+ 1013  sage --python setup.py install --user --record filessage.txt
+ 1014  cd $CRUNCH_ROOT 
+ 1015  sview
+ 1016  cd api/db/crunch_db_mongodb/
+ 1017  python setup.py install --user --record filespy.txt
+ 1018  sage --python setup.py install --user --record filessage.txt
+ 1019  cd ../..
+ 1020  cd ..
+ 1021  cd modules/
+ 1022  git status
+ 1023  git add -A .
+ 1024  git commit -m "Updated several modules."
+ 1025  git push origin master
+ 1026  cd ..
+ 1027  cd api/crunch_config/
+ 1028  l
+ 1029  ls
+ 1030  cd crunch_config
+ 1031  ls
+ 1032  cd ../..
+ 1033  cd ..
+ 1034  vi .gitignore
+ 1035  git rm -rf --cached .
+ 1036  git add -A .
+ 1037  git commit -m "Updates to crunch_db_mongodb and wrapper.py."
+ 1038  git push origin master
+ 1039  cd ~
+ 1040  wget https://github.com/mongodb/mongo-c-driver/releases/download/1.10.0/mongo-c-driver-1.10.0.tar.gz
+ 1041  wget git@github.com:mongodb/mongo-c-driver/releases/download/1.10.0/mongo-c-driver-1.10.0.tar.gz
+ 1042  tar xzfv mongo-c-driver-1.10.0.tar.gz 
+ 1043  cd mongo-c-driver-1.10.0
+ 1044  mkdir cmake-build
+ 1045  cd cmake-build
+ 1046  cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DCMAKE_BUILD_TYPE=Release
+ 1047  uname -a
+ 1048  more /etc/*-release
+ 1049  cd ../..
+ 1050  wget https://cmake.org/files/v3.11/cmake-3.11.2-Linux-x86_64.tar.gz
+ 1051  tar xzfv cmake-3.11.2-Linux-x86_64.tar.gz 
+ 1052  cd cmake-3.11.2-Linux-x86_64
+ 1053  ls
+ 1054  cd bin/
+ 1055  ls
+ 1056  cd ../opt/bin
+ 1057  ls
+ 1058  cd ../..
+ 1059  cd opt
+ 1060  cd bin
+ 1061  ls
+ 1062  cd ..
+ 1063  ls
+ 1064  cd share/
+ 1065  ls
+ 1066  cd ../..
+ 1067  cd cmake-3.11.2-Linux-x86_64
+ 1068  cd bin
+ 1069  pwd
+ 1070  source ~/.bashrc
+ 1071  cd ..
+ 1072  cd ../mongo-c-driver-1.10.0
+ 1073  cd cmake-build/
+ 1074  cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DCMAKE_BUILD_TYPE=Release
+ 1075  cd ../..
+ 1076  rm -r cmake-3.11.2-Linux-x86_64
+ 1077  rm cmake-3.11.2-Linux-x86_64.tar.gz 
+ 1078  tar xzfv cmake-3.11.2.tar.gz 
+ 1079  cd cmake-3.11.2
+ 1080  ls
+ 1081  ./bootstrap --prefix="/home/altman.ro/opt"
+ 1082  make && make install
+ 1083  which cmake
+ 1084  cd ..
+ 1085  cd mongo-c-driver-1.10.0
+ 1086  ls
+ 1087  more README.rst 
+ 1088  cd cmake-build/
+ 1089  cmake -L
+ 1090  source ~/.bashrc
+ 1091  cmake -L
+ 1092  cd ..
+ 1093  cd build/
+ 1094  ls
+ 1095  cd ..
+ 1096  rm -r cmake-build
+ 1097  cd build/
+ 1098  cmake -L
+ 1099  cd ..
+ 1100  cmake -L
+ 1101  cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DCMAKE_BUILD_TYPE=Release
+ 1102  cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"
+ 1103  cd ../opt/include
+ 1104  ls
+ 1105  cd ..
+ 1106  ls
+ 1107  cd lib
+ 1108  ls
+ 1109  cd ../libexec/
+ 1110  ls
+ 1111  cd ..
+ 1112  cd 
+ 1113  cd ..
+ 1114  cd altman.ro
+ 1115  cd mongo
+ 1116  cd mongo-c-driver-1.10.0
+ 1117  ls
+ 1118  cd ..
+ 1119  tar xzfv mongo-cxx-driver-r3.2.0.tar.gz 
+ 1120  cd mongo-cxx-driver-r3.2.0
+ 1121  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX=/home/altman.ro/opt     -DCMAKE_PREFIX_PATH=/home/altman.ro/opt
+ 1122  cd ..
+ 1123  ls
+ 1124  cd mongo-cxx-driver-r3.2.0
+ 1125  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/mongo-c-driver-1.10.0"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"
+ 1126  cd ../mongo-c
+ 1127  cd ../mongo-c-driver-1.10.0
+ 1128  ls
+ 1129  cd ..
+ 1130  rm -r mongo-c-driver-1.10.0
+ 1131  tar xzfv mongo-c-driver-1.10.0.tar.gz 
+ 1132  cd mongo-c-driver-1.10.0
+ 1133  ls
+ 1134  mkdir cmake-build
+ 1135  cd cmake-build/
+ 1136  cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"
+ 1137  cd ..
+ 1138  rm -r cmake-build
+ 1139  cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"
+ 1140  cd ../mongo-cxx-driver-r3.2.0
+ 1141  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/mongo-c-driver-1.10.0"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"
+ 1142  cd ../mongo-c-
+ 1143  ls
+ 1144  cd ../
+ 1145  ls
+ 1146  cd mongo-c-driver-1.10.0
+ 1147  ls
+ 1148  cd build/
+ 1149  ls
+ 1150  cd ..
+ 1151  cd CMakeFiles/
+ 1152  l
+ 1153  sls
+ 1154  ls
+ 1155  cd 3.11.2/
+ 1156  ls
+ 1157  cd ..
+ 1158  ls
+ 1159  cd ..
+ 1160  make
+ 1161  make install
+ 1162  ls
+ 1163  cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"
+ 1164  cmake -DENABLE_AUTOMATIC_INIT_AND_CLEANUP=OFF -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"
+ 1165  make
+ 1166  make install
+ 1167  cd ../mongo-cxx-driver-r3.2.0
+ 1168  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"
+ 1169  make
+ 1170  make EP_mnmlstc_core
+ 1171  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"     -DBSONCXX_POLY_USE_MNMLSTC=1
+ 1172  make EP_mnmlstc_core
+ 1173  cd build/
+ 1174  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"     -DBSONCXX_POLY_USE_MNMLSTC=1
+ 1175  ls
+ 1176  cd ..
+ 1177  rm -r mongo-cxx-driver-r3.2.0
+ 1178  tar xzfv mongo-cxx-driver-r3.2.0.tar.gz 
+ 1179  rm mongo-cxx-driver-r3.2.0.tar.gz 
+ 1180  rm mongo-c-driver-1.10.0.tar.gz 
+ 1181  rm cmake-3.11.2.tar.gz 
+ 1182  cd mongo-cxx-driver-r3.2.0/build/
+ 1183  ls
+ 1184  cd ..
+ 1185  ls
+ 1186  more README.md 
+ 1187  cd ..
+ 1188  wget git@github.com:mnmlstc/core.git
+ 1189  tar xzfv v1.1.0.tar.gz 
+ 1190  cd core-1.1.0/
+ 1191  ls
+ 1192  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"
+ 1193  cmake -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"
+ 1194  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"
+ 1195  cd ..
+ 1196  tar xzfv unittest-cpp-2.0.0.tar.gz 
+ 1197  rm unittest-cpp-2.0.0.tar.gz 
+ 1198  ls
+ 1199  cd unittest-cpp-2.0.0/
+ 1200  ls
+ 1201  cmake -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"
+ 1202  make
+ 1203  ./configure prefix="/home/altman.ro/opt"
+ 1204  ls
+ 1205  ./configure.ac prefix="/home/altman.ro/opt"
+ 1206  ls -l
+ 1207  automake
+ 1208  cd ..
+ 1209  wget http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz
+ 1210  tar xzfv autoconf-2.69.tar.gz 
+ 1211  rm autoconf-2.69.tar.gz 
+ 1212  cd autoconf-2.69/
+ 1213  ls
+ 1214  more INSTALL 
+ 1215  ls
+ 1216  ./configure --prefix="/home/altman.ro/opt"
+ 1217  make
+ 1218  make install
+ 1219  cd ../unittest-cpp-2.0.0/
+ 1220  automake
+ 1221  autoconf configure.ac 
+ 1222  autoconf
+ 1223  autoreconf --install
+ 1224  autoreconf -i
+ 1225  aclocal
+ 1226  cd ..
+ 1227  rm -r unittest-cpp-2.0.0
+ 1228  git clone https://github.com/unittest-cpp/unittest-cpp
+ 1229  git clone git@github.com:unittest-cpp/unittest-cpp
+ 1230  cd unittest-cpp/
+ 1231  autoconf
+ 1232  aclocal
+ 1233  autoheader
+ 1234  automake
+ 1235  autoconf
+ 1236  ls
+ 1237  ./configure --prefix="/home/altman.ro/opt"
+ 1238  libtoolize --force
+ 1239  aclocal
+ 1240  autoheader
+ 1241  automake --force-missing --add-missing
+ 1242  autoconf
+ 1243  ./configure --prefix="/home/altman.ro/opt"
+ 1244  make
+ 1245  autoconf
+ 1246  cd ..
+ 1247  rm -r unittest-cpp
+ 1248  rm -rf unittest-cpp
+ 1249  git clone git@github.com:unittest-cpp/unittest-cpp
+ 1250  cd unittest-cpp/
+ 1251  libtoolize --force
+ 1252  aclocal
+ 1253  autoheader
+ 1254  automake --force-missing --add-missing
+ 1255  autoconf
+ 1256  ./configure --prefix="/home/altman.ro/opt"
+ 1257  more README.md 
+ 1258  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"
+ 1259  make
+ 1260  git checkout v2.0.0
+ 1261  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"
+ 1262  make
+ 1263  cd ..
+ 1264  rm -rf unittest-cpp/
+ 1265  git clone git@github.com:unittest-cpp/unittest-cpp
+ 1266  cd unittest-cpp/
+ 1267  git checkout v2.0.0
+ 1268  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"
+ 1269  make
+ 1270  cd ..
+ 1271  rm -rf unittest-cpp
+ 1272  git clone git@github.com:unittest-cpp/unittest-cpp
+ 1273  git checkout v2.0.0
+ 1274  cd unittest-cpp/
+ 1275  git checkout v2.0.0
+ 1276  cd builds/
+ 1277  ls
+ 1278  cmake --help
+ 1279  cmake -G "Unix Makefiles" ../
+ 1280  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"
+ 1281  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt" --build ./
+ 1282  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt" --build ./ --target install
+ 1283  cmake --build ./
+ 1284  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt" --build ./
+ 1285  make
+ 1286  cd ,,
+ 1287  ls
+ 1288  cmake --build ./ --target install
+ 1289  cd ../..
+ 1290  rm -rf unittest-cpp/
+ 1291  git clone git@github.com:unittest-cpp/unittest-cpp
+ 1292  git checkout v2.0.0
+ 1293  cd unittest-cpp/
+ 1294  git checkout v2.0.0
+ 1295  cd builds
+ 1296  cmake -G "Unix Makefiles" ../
+ 1297  cmake --build ./
+ 1298  cd ..
+ 1299  autoreconf -fvi
+ 1300  ./configure --prefix="/home/altman.ro/opt"
+ 1301  make
+ 1302  make install
+ 1303  cd ..
+ 1304  ls
+ 1305  cd mongo-cxx-driver-r3.2.0/
+ 1306  ls
+ 1307  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"     -DBSONCXX_POLY_USE_SYSTEM_MNMLSTC
+ 1308  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"     -DBSONCXX_POLY_USE_SYSTEM_MNMLSTC=1
+ 1309  make EP_mnmlstc_core
+ 1310  make
+ 1311  cd ../opt/include/
+ 1312  ls
+ 1313  cd UnitTest++/
+ 1314  ls
+ 1315  cd ..
+ 1316  ls
+ 1317  cd ..
+ 1318  cd core-1.1.0/
+ 1319  ls
+ 1320  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"
+ 1321  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"
+ 1322  ls ../
+ 1323  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/unittest-cpp"
+ 1324  cd ../opt/include/UnitTest++/
+ 1325  ls
+ 1326  cd ../../
+ 1327  cd ../core-1.1.0/
+ 1328  ls
+ 1329  cd ..
+ 1330  rm -r core-1.1.0
+ 1331  git clone git@github.com:mnmlstc/core.git
+ 1332  cd core/
+ 1333  ls
+ 1334  git checkout v1.1.0
+ 1335  cd ls
+ 1336  ls
+ 1337  more Readme.rst 
+ 1338  ls
+ 1339  autoreconf -fvi
+ 1340  mkdir build
+ 1341  cd build/
+ 1342  cmake -G "Unix Makefiles" ../
+ 1343  cd ../..
+ 1344  git clone git@github.com:mnmlstc/unittest.git
+ 1345  cd unittest
+ 1346  ls
+ 1347  git checkout v1.0.4
+ 1348  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"
+ 1349  make
+ 1350  make install
+ 1351  cd ../core/
+ 1352  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"
+ 1353  make
+ 1354  make install
+ 1355  cd ../mongo-cxx-driver-r3.2.0/
+ 1356  ls
+ 1357  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"     -DBSONCXX_POLY_USE_SYSTEM_MNMLSTC=1
+ 1358  make EP_mnmlstc_core
+ 1359  make
+ 1360  cd ../opt/include/
+ 1361  ls
+ 1362  cd core/
+ 1363  ls
+ 1364  echo $CPLUS_INCLUDE_PATH
+ 1365  source ~/.bashrc
+ 1366  echo $CPLUS_INCLUDE_PATH
+ 1367  source ~/.bashrc
+ 1368  cd ../..
+ 1369  cd ../mongo-cxx-driver-r3.2.0/
+ 1370  make
+ 1371  gcc -v
+ 1372  CXXFLAGS='-std=c++11' make
+ 1373  ls
+ 1374  vi Makefile 
+ 1375  make
+ 1376  cd ..
+ 1377  rm -r mongo-cxx-driver-r3.2.0
+ 1378  git clone git@github.com:mongodb/mongo-cxx-driver.git
+ 1379  cd mongo-cxx-driver/
+ 1380  git checkout r3.2.0
+ 1381  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"     -DBSONCXX_POLY_USE_SYSTEM_MNMLSTC=1
+ 1382  make
+ 1383  git checkout r3.1.4
+ 1384  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"     -DBSONCXX_POLY_USE_SYSTEM_MNMLSTC=1
+ 1385  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"
+ 1386  git checkout r3.2.0
+ 1387  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"     -DBSONCXX_POLY_USE_SYSTEM_MNMLSTC=1
+ 1388  make CC=gcc-4.9
+ 1389  cd src/mongocxx/test
+ 1390  vi pool.cpp 
+ 1391  make CC=gcc-4.9
+ 1392  gcc -v
+ 1393  g++ -v
+ 1394  vi pool.cpp 
+ 1395  make CC=gcc-4.9
+ 1396  vi pool.cpp 
+ 1397  make CC=gcc-4.9
+ 1398  vi pool.cpp 
+ 1399  make CC=gcc-4.9
+ 1400  vi pool.cpp 
+ 1401  make CC=gcc-4.9
+ 1402  vi pool.cpp 
+ 1403  make CC=gcc-4.9
+ 1404  vi pool.cpp 
+ 1405  vi Makefile 
+ 1406  make CC=gcc-4.9
+ 1407  cd ../..
+ 1408  cd ..
+ 1409  make
+ 1410  git checkout r3.1.3
+ 1411  cd .. 
+ 1412  rm -rf mongo-cxx-driver
+ 1413  git clone git@github.com:mongodb/mongo-cxx-driver.git
+ 1414  cd mongo-cxx-driver/
+ 1415  git checkout r3.1.3
+ 1416  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"     -DBSONCXX_POLY_USE_SYSTEM_MNMLSTC=1
+ 1417  make
+ 1418  cd ..
+ 1419  ls
+ 1420  rm -r mongo-c-driver-1.10.0
+ 1421  git clone git@github.com:mongodb/mongo-c-driver.git
+ 1422  cd mongo-c-driver/
+ 1423  git checkout 1.5.0
+ 1424  ls
+ 1425  autoreconf -fvi
+ 1426  make
+ 1427  make install
+ 1428  ls
+ 1429  ./configure --prefix="/home/altman.ro/opt"
+ 1430  make
+ 1431  make install
+ 1432  ls
+ 1433  cd build/
+ 1434  ls
+ 1435  cd ..
+ 1436  ls
+ 1437  more README.rst 
+ 1438  make
+ 1439  cd ..
+ 1440  rm -r mongo-c-driver/
+ 1441  rm -rf mongo-c-driver/
+ 1442  git clone git@github.com:mongodb/mongo-c-driver.git
+ 1443  git checkout 1.5.0
+ 1444  cd mongo-c-driver/
+ 1445  git checkout 1.5.0
+ 1446  l
+ 1447  ls
+ 1448  more README.rst 
+ 1449  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"
+ 1450  make
+ 1451  cd ..
+ 1452  rm -rf mongo-c-driver/
+ 1453  cd mongo-cxx-driver/
+ 1454  git checkout r3.2.0
+ 1455  ls
+ 1456  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"     -DBSONCXX_POLY_USE_SYSTEM_MNMLSTC=1
+ 1457  make
+ 1458  cd src/mongocxx/test
+ 1459  vi pool.cpp 
+ 1460  make
+ 1461  vi pool.cpp 
+ 1462  make
+ 1463  vi pool.cpp 
+ 1464  make
+ 1465  vi pool.cpp 
+ 1466  make
+ 1467  vi pool.cpp 
+ 1468  cd ..
+ 1469  rm -r mongo-cxx-driver
+ 1470  rm -rf mongo-cxx-driver
+ 1471  git clone git@github.com:mongodb/mongo-cxx-driver.git
+ 1472  cd mongo-cxx-driver/
+ 1473  git checkout r3.2.0
+ 1474  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"     -DBSONCXX_POLY_USE_SYSTEM_MNMLSTC=1
+ 1475  make
+ 1476  cd src/mongocxx/test
+ 1477  vi pool.cpp 
+ 1478  make
+ 1479  vi pool.cpp 
+ 1480  make
+ 1481  vi pool.cpp 
+ 1482  source ~/.bashrc
+ 1483  gcc -v
+ 1484  make
+ 1485  cd ../..
+ 1486  cd ..
+ 1487  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"     -DBSONCXX_POLY_USE_SYSTEM_MNMLSTC=1
+ 1488  make
+ 1489  source ~/.bashrc
+ 1490  make
+ 1491  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"     -DBSONCXX_POLY_USE_SYSTEM_MNMLSTC=1
+ 1492  make
+ 1493  history | grep "make CC"
+ 1494  make CC=gcc-4.9
+ 1495  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"     -DBSONCXX_POLY_USE_SYSTEM_MNMLSTC=1
+ 1496  make CC=gcc-4.9
+ 1497  source ~/.bashrc
+ 1498  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"     -DBSONCXX_POLY_USE_SYSTEM_MNMLSTC=1
+ 1499  make CC=gcc-4.9.3
+ 1500  cd ..
+ 1501  rm -rf mongo-cxx-driver/
+ 1502  history | grep "git clone"
+ 1503  git clone git@github.com:mongodb/mongo-cxx-driver.git
+ 1504  cd mongo-cxx-driver/
+ 1505  git checkout r3.2.0
+ 1506  cmake -DCMAKE_BUILD_TYPE=Release     -DCMAKE_INSTALL_PREFIX="/home/altman.ro/opt"     -DCMAKE_PREFIX_PATH="/home/altman.ro/opt"     -DBSONCXX_POLY_USE_SYSTEM_MNMLSTC=1
+ 1507  make all
+ 1508  make install
+ 1509  cd ../opt/include/
+ 1510  ls
+ 1511  cd ..
+ 1512  cd /gss_gpfs_scratch/altman.ro/DBCrunch/modules/modules/conebounds/code/
+ 1513  g++ 2dIdentifier_h11IDs.cpp -o ../2dIdentifier_h11IDs
+ 1514  g++ 2dIdentifier_h11IDs.cpp -o ../2dIdentifier_h11IDs -std=c++11
+ 1515  ls ${USER_LOCAL}/include/job
+ 1516  ls ${USER_LOCAL}/include/jon
+ 1517  ls ${USER_LOCAL}/include/jon/full
+ 1518  g++ 2dIdentifier_h11IDs.cpp -o ../2dIdentifier_h11IDs -std=c++11
+ 1519  g++ conebounds.cpp -o ../conebounds -std=c++11
+ 1520  cd ~/opt/include
+ 1521  ls
+ 1522  mkdir kreuzer
+ 1523  mv jon kreuzer/
+ 1524  mkdir kreuzer/json
+ 1525  cd /gss_gpfs_scratch/altman.ro/DBCrunch/modules/modules/conebounds/code/
+ 1526  g++ conebounds.cpp -o ../conebounds -std=c++11
+ 1527  man pkg-config
+ 1528  g++ conebounds.cpp -o ../conebounds -std=c++11 $(pkg-config --cflags --libs libmongocxx)
+ 1529  g++ conebounds.cpp -o ../conebounds -std=c++11 -I/usr/local/include/mongocxx/v_noabi -I/usr/local/include/libmongoc-1.0   -I/usr/local/include/bsoncxx/v_noabi -I/usr/local/include/libbson-1.0   -L/usr/local/lib -lmongocxx -lbsoncxx
+ 1530  g++ conebounds.cpp -o ../conebounds -std=c++11 -I"${USER_LOCAL}/include/mongocxx/v_noabi" -I"${USER_LOCAL}/include/libmongoc-1.0"   -I"${USER_LOCAL}/include/bsoncxx/v_noabi" -I"${USER_LOCAL}/include/libbson-1.0"   -L"${USER_LOCAL}/lib" -lmongocxx -lbsoncxx
+ 1531  cd ..
+ 1532  cd cone_poly_data/
+ 1533  cp /gss_gpfs_scratch/altman.ro/subcones/CONEPOLYDATA_H11_* ./
+ 1534  cd ../code/
+ 1535  g++ conebounds.cpp -o ../conebounds -std=c++11 -I"${USER_LOCAL}/include/mongocxx/v_noabi" -I"${USER_LOCAL}/include/libmongoc-1.0"   -I"${USER_LOCAL}/include/bsoncxx/v_noabi" -I"${USER_LOCAL}/include/libbson-1.0"   -L"${USER_LOCAL}/lib" -lmongocxx -lbsoncxx
+ 1536  cd ..
+ 1537  ./conebounds 
+ 1538  pkg-config --cflags --libs libmongocxx -I"${USER_LOCAL}/include/mongocxx/v_noabi" -I"${USER_LOCAL}/include/libmongoc-1.0" -I"${USER_LOCAL}/include/bsoncxx/v_noabi" -I"${USER_LOCAL}/include/libbson-1.0" -L"${USER_LOCAL}/lib" -lmongocxx -lbsoncxx
+ 1539  pkg-config --cflags --libs libmongocxx
+ 1540  source ~/.bashrc
+ 1541  pkg-config --cflags --libs libmongocxx
+ 1542  source ~/.bashrc
+ 1543  pkg-config --cflags --libs libmongocxx
+ 1544  cd ../code
+ 1545  ls
+ 1546  cd code
+ 1547  g++ conebounds.cpp -o ../conebounds -std=c++11 $(pkg-config --cflags --libs libmongocxx)
+ 1548  ../conebounds
+ 1549  ../conebounds 1
+ 1550  ../conebounds 2
+ 1551  g++ conebounds.cpp -o ../conebounds -std=c++11 $(pkg-config --cflags --libs libmongocxx)
+ 1552  ../conebounds 2
+ 1553  g++ conebounds.cpp -o ../conebounds -std=c++11 $(pkg-config --cflags --libs libmongocxx)
+ 1554  ../conebounds 1
+ 1555  g++ conebounds.cpp -o ../conebounds -std=c++11 $(pkg-config --cflags --libs libmongocxx)
+ 1556  ../conebounds 1
+ 1557  g++ conebounds.cpp -o ../conebounds -std=c++11 $(pkg-config --cflags --libs libmongocxx)
+ 1558  ../conebounds 1
+ 1559  g++ conebounds.cpp -o ../conebounds -std=c++11 $(pkg-config --cflags --libs libmongocxx)
+ 1560  ../conebounds 1
+ 1561  g++ conebounds.cpp -o ../conebounds -std=c++11 $(pkg-config --cflags --libs libmongocxx)
+ 1562  ../conebounds 1
+ 1563  g++ conebounds.cpp -o ../conebounds -std=c++11 $(pkg-config --cflags --libs libmongocxx)
+ 1564  ../conebounds 1
+ 1565  g++ conebounds.cpp -o ../conebounds -std=c++11 $(pkg-config --cflags --libs libmongocxx)
+ 1566  ../conebounds 1
+ 1567  g++ conebounds.cpp -o ../conebounds -std=c++11 $(pkg-config --cflags --libs libmongocxx)
+ 1568  ../conebounds 1
+ 1569  g++ conebounds.cpp -o ../conebounds -std=c++11 $(pkg-config --cflags --libs libmongocxx)
+ 1570  ../conebounds 1
+ 1571  g++ conebounds.cpp -o ../conebounds -std=c++11 $(pkg-config --cflags --libs libmongocxx)
+ 1572  ../conebounds 1
+ 1573  g++ conebounds.cpp -o ../conebounds -std=c++11 $(pkg-config --cflags --libs libmongocxx)
+ 1574  ../conebounds 1
+ 1575  g++ conebounds.cpp -o ../conebounds -std=c++11 $(pkg-config --cflags --libs libmongocxx)
+ 1576  ../conebounds 1
+ 1577  cd ~
+ 1578  ls
+ 1579  cd cmake-3.11.2/
+ 1580  ls
+ 1581  history | grep "bootstrap"
+ 1582  history | grep "108"
+ 1583  cd /gss_gpfs_scratch/altman.ro/DBCrunch/modules/modules/conebounds/code/
+ 1584  history > history.txt

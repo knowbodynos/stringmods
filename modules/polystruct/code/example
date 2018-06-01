@@ -1,0 +1,8 @@
+g++ polystruct.cpp -o ../polystruct -std=c++11 \
+-I"${USER_LOCAL}/include/mongocxx/v_noabi" -I"${USER_LOCAL}/include/libmongoc-1.0" \
+-I"${USER_LOCAL}/include/bsoncxx/v_noabi" -I"${USER_LOCAL}/include/libbson-1.0" \
+-L"${USER_LOCAL}/lib" -lmongocxx -lbsoncxx
+
+or 
+
+g++ polystruct.cpp -o ../polystruct -std=c++11 $(pkg-config --cflags --libs libmongocxx)
