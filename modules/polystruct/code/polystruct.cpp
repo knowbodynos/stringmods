@@ -87,11 +87,11 @@ int main(int argc, char* argv[]) {
     mongocxx::instance inst{};
 
     // Connect to the database
-    mongocxx::uri uri("mongodb://NEUString:kreuzer@129.10.135.170:27017");
+    mongocxx::uri uri("mongodb://raltman:kreuzer@129.10.135.170:27017/SUBCONES");
     mongocxx::client conn(uri);
 
     // Get the collections to use
-    mongocxx::collection poly_collection = conn["ToricCY"]["POLY"];
+    // mongocxx::collection poly_collection = conn["ToricCY"]["POLY"];
     mongocxx::collection cone_collection = conn["SUBCONES"]["CONE"];
     mongocxx::collection face_collection = conn["SUBCONES"]["FACE"];
 
@@ -289,6 +289,8 @@ int main(int argc, char* argv[]) {
             Json::Value out_doc;
             out_doc["H11"] = Json::Value(h11);
             out_doc["POLYID"] = Json::Value(poly_id);
+            out_doc["NVERTS"] = Json::Value(nverts);
+
             if (poly_doc.isMember("NALLTRIANGS")) {
                 int poly_triang = poly_doc["NALLTRIANGS"].asInt();
                 out_doc["NFSRT"] = Json::Value(poly_triang);
