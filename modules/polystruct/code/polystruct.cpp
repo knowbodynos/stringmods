@@ -3,7 +3,7 @@
 #include <regex>
 #include <map>
 // #include <locale>
-#include <jon/full/CPPALPv2.h>
+#include <jon/full/CPPALPv3.h>
 #include <jon/full/jpy.h>
 #include <jon/full/jmongo.h> //includes jsoncpp
 #include <jon/full/jstring.h>
@@ -113,7 +113,8 @@ int main(int argc, char* argv[]) {
     // std::wstring wline;
     // while (getline(std::wcin, wline)) {
     std::string line;
-    while (getline(std::cin, line)) {
+    // while (getline(std::cin, line)) {
+    getline(std::cin, line);
     // By h11
     // int h11a = std::stoi(argv[1]);
     // auto poly_curs = jmongo::simple_find(poly_collection, "H11", h11a);
@@ -121,219 +122,218 @@ int main(int argc, char* argv[]) {
     //     // Parse line to json
     //     std::string line = bsoncxx::to_json(poly_doc_bson);
         // std::string line = std::string(wline.begin(), wline.end());
-        line = std::regex_replace(line, std::regex("'"), "\"");
-        success = reader->parse(line.c_str(), line.c_str() + line.size(), &poly_doc, &err);
-        if (!success) {
-            std::cout << line << std::endl;
-            std::cout << err << std::endl;
+    line = std::regex_replace(line, std::regex("'"), "\"");
+    success = reader->parse(line.c_str(), line.c_str() + line.size(), &poly_doc, &err);
+    if (!success) {
+        std::cout << line << std::endl;
+        std::cout << err << std::endl;
+    }
+    assert(poly_doc["H11"].isInt());
+    assert(poly_doc["POLYID"].isInt());
+    assert(poly_doc["NVERTS"].isString());
+
+    int h11 = poly_doc["H11"].asInt();
+    int poly_id = poly_doc["POLYID"].asInt();
+    std::string nverts = poly_doc["NVERTS"].asString();
+    std::vector<std::vector<int> > poly_verts = string_to_vertex_list(nverts);
+
+    IntMatrix poly_mat(poly_verts[0].size(), poly_verts.size());
+    for (int i = 0; i < poly_verts.size(); i++) {
+        for (int j = 0; j < poly_verts[0].size(); j++) {
+            poly_mat(j, i) = (double) poly_verts[i][j];
         }
-        assert(poly_doc["H11"].isInt());
-        assert(poly_doc["POLYID"].isInt());
-        // assert(poly_doc["NALLTRIANGS"].isInt());
-        assert(poly_doc["NVERTS"].isString());
+    }
 
-        int h11 = poly_doc["H11"].asInt();
-        int poly_id = poly_doc["POLYID"].asInt();
-        std::string nverts = poly_doc["NVERTS"].asString();
-        std::vector<std::vector<int> > poly_verts = string_to_vertex_list(nverts);
-
-        IntMatrix poly_mat(poly_verts[0].size(), poly_verts.size());
-        for (int i = 0; i < poly_verts.size(); i++) {
-            for (int j = 0; j < poly_verts[0].size(); j++) {
-                poly_mat(j, i) = (double) poly_verts[i][j];
-            }
+    IntCol origin_col(poly_verts[0].size());
+        for (int i = 0; i < poly_verts[0].size(); i++) {
+            origin_col(i) = (double) 0;
         }
+    
+    LatticePolytope newton_poly = LatticePolytope(poly_mat);
 
-        IntCol origin_col(poly_verts[0].size());
-            for (int i = 0; i < poly_verts[0].size(); i++) {
-                origin_col(i) = (double) 0;
-            }
-        
-        LatticePolytope newton_poly = LatticePolytope(poly_mat);
+    if (newton_poly.is_reflexive()) {
+        // For the dual
+        LatticePolytope poly = newton_poly.polar();
 
-        if (newton_poly.is_reflexive()) {
-            // For the dual
-            LatticePolytope poly = newton_poly.polar();
+        std::vector<IntMatrix> face3d_mats = poly.faces(3);
 
-            std::vector<IntMatrix> face3d_mats = poly.faces(3);
+        // std::map<std::string, int> face3d_to_id;
+        std::map<std::string, int> face2d_to_id;
 
-            // std::map<std::string, int> face3d_to_id;
-            std::map<std::string, int> face2d_to_id;
+        // std::vector<int> face3d_ids;
+        // std::vector<int> face2d_ids;
 
-            // std::vector<int> face3d_ids;
+        // std::map<vector<int>, int> face2d_ids_mult;
+
+        std::map<std::string, std::vector<int> > face2d_mat_to_face3d_ids;
+        // Create 2FACETO3FACE
+        Json::Value face3d_id_to_faces2d_ids;
+
+        // std::vector<IntMatrix> face3d_nf_mats;
+        // std::vector<std::vector<IntMatrix> > face3d_face2d_fulldmats;
+        // std::vector<IntMatrix> uniq_face2d_fulldmats;
+        for (IntMatrix face3d_mat : face3d_mats) {
+            IntMatrix cone4d_mat = add_col(face3d_mat, origin_col, 0);
+            IntMatrix cone4d_nf_mat = LatticePolytope(cone4d_mat).normal_form();
+
+            std::string cone_doc = jmongo::simple_find_one(cone_collection, "NORMALFORM", intmat_to_string(cone4d_nf_mat));
+            int cone_id = std::stoi(jmongo::get_field(cone_doc, "CONEID", reader));
+            int cone_triang = std::stoi(jmongo::get_field(cone_doc, "FACETNREGTRIANG", reader));
+
+            // face3d_ids.push_back(cone_id);
+
+            sort_intmat_cols(face3d_mat, compare_cols);
+
+            // face3d_to_id[intmat_to_string(face3d_mat)] = cone_id;
+
+            // IntMatrix face3d_nf_mat = remove_col(cone4d_nf_mat, origin_col);
+            // face3d_nf_mats.push_back(face3d_nf_mat);
+
+            // Create the LatticePolytope for the facet
+            LatticePolytope face3d_poly(face3d_mat);
+            // Get the 2-faces of the facet
+            std::vector<IntMatrix> face2d_mats = face3d_poly.faces(2, false);
+
             // std::vector<int> face2d_ids;
 
-            // std::map<vector<int>, int> face2d_ids_mult;
+            // std::vector<IntMatrix> face2d_fulldmats;
 
-            std::map<std::string, std::vector<int> > face2d_mat_to_face3d_ids;
-            // Create 2FACETO3FACE
-            Json::Value face3d_id_to_faces2d_ids;
+            Json::Value inner(Json::arrayValue);
 
-            // std::vector<IntMatrix> face3d_nf_mats;
-            // std::vector<std::vector<IntMatrix> > face3d_face2d_fulldmats;
-            // std::vector<IntMatrix> uniq_face2d_fulldmats;
-            for (IntMatrix face3d_mat : face3d_mats) {
-                IntMatrix cone4d_mat = add_col(face3d_mat, origin_col, 0);
-                IntMatrix cone4d_nf_mat = LatticePolytope(cone4d_mat).normal_form();
+            for (IntMatrix face2d_mat : face2d_mats) {
+                // Get 2-face in normal form to obtain FACEID
+                IntMatrix cone3d_nf_mat = LatticePolytope(face2d_mat).normal_form();
 
-                std::string cone_doc = jmongo::simple_find_one(cone_collection, "NORMALFORM", intmat_to_string(cone4d_nf_mat));
-                int cone_id = std::stoi(jmongo::get_field(cone_doc, "CONEID", reader));
-                int cone_triang = std::stoi(jmongo::get_field(cone_doc, "FACETNREGTRIANG", reader));
+                std::string face_doc = jmongo::simple_find_one(face_collection, "NORMALFORM", intmat_to_string(cone3d_nf_mat));
+                int face_id = std::stoi(jmongo::get_field(face_doc, "FACEID", reader));
 
-                // face3d_ids.push_back(cone_id);
+                // face2d_ids.push_back(face_id);
 
-                sort_intmat_cols(face3d_mat, compare_cols);
+                inner.append(Json::Value(face_id));
 
-                // face3d_to_id[intmat_to_string(face3d_mat)] = cone_id;
+                // Get 2-face in full dimension, so it can be compared among different 3-faces
+                IntMatrix face2d_fulldmat = face3d_poly.pointsfullD(face2d_mat);
+                // Sort 2-face vertex matrix
+                sort_intmat_cols(face2d_fulldmat, compare_cols);
 
-                // IntMatrix face3d_nf_mat = remove_col(cone4d_nf_mat, origin_col);
-                // face3d_nf_mats.push_back(face3d_nf_mat);
+                face2d_to_id[intmat_to_string(face2d_fulldmat)] = face_id;
 
-                // Create the LatticePolytope for the facet
-                LatticePolytope face3d_poly(face3d_mat);
-                // Get the 2-faces of the facet
-                std::vector<IntMatrix> face2d_mats = face3d_poly.faces(2, false);
+                face2d_mat_to_face3d_ids[intmat_to_string(face2d_fulldmat)].push_back(cone_id);
 
-                // std::vector<int> face2d_ids;
+                // face2d_fulldmats.push_back(face2d_fulldmat);
 
-                // std::vector<IntMatrix> face2d_fulldmats;
-
-                Json::Value inner(Json::arrayValue);
-
-                for (IntMatrix face2d_mat : face2d_mats) {
-                    // Get 2-face in normal form to obtain FACEID
-                    IntMatrix cone3d_nf_mat = LatticePolytope(face2d_mat).normal_form();
-
-                    std::string face_doc = jmongo::simple_find_one(face_collection, "NORMALFORM", intmat_to_string(cone3d_nf_mat));
-                    int face_id = std::stoi(jmongo::get_field(face_doc, "FACEID", reader));
-
-                    // face2d_ids.push_back(face_id);
-
-                    inner.append(Json::Value(face_id));
-
-                    // Get 2-face in full dimension, so it can be compared among different 3-faces
-                    IntMatrix face2d_fulldmat = face3d_poly.pointsfullD(face2d_mat);
-                    // Sort 2-face vertex matrix
-                    sort_intmat_cols(face2d_fulldmat, compare_cols);
-
-                    face2d_to_id[intmat_to_string(face2d_fulldmat)] = face_id;
-
-                    face2d_mat_to_face3d_ids[intmat_to_string(face2d_fulldmat)].push_back(cone_id);
-
-                    // face2d_fulldmats.push_back(face2d_fulldmat);
-
-                    // // Add unique 2-faces to uniq_face2d_fulldmats
-                    // int i = 0;
-                    // while (i < uniq_face2d_fulldmats.size()) {
-                    //     if (face2d_fulldmat.cols() == uniq_face2d_fulldmats[i].cols() && face2d_fulldmat == uniq_face2d_fulldmats[i]) { break; }
-                    //     i++;
-                    // }
-                    // if (i == uniq_face2d_fulldmats.size()) {
-                    //     uniq_face2d_fulldmats.push_back(face2d_fulldmat);
-                    // }
-                }
-
-                // std::sort(face2d_ids.begin(), face2d_ids.end());
-                // face2d_ids_mult[face2d_ids]++:
-
-                // if (face2d_ids_mult[face2d_ids] == 1) {
-                std::string key = std::to_string(cone_id);
-                if (face3d_id_to_faces2d_ids.isMember(key)) {
-                    face3d_id_to_faces2d_ids[key].append(inner);
-                } else {
-                    Json::Value outer(Json::arrayValue);
-                    outer.append(inner);
-                    face3d_id_to_faces2d_ids[key] = outer;
-                }
+                // // Add unique 2-faces to uniq_face2d_fulldmats
+                // int i = 0;
+                // while (i < uniq_face2d_fulldmats.size()) {
+                //     if (face2d_fulldmat.cols() == uniq_face2d_fulldmats[i].cols() && face2d_fulldmat == uniq_face2d_fulldmats[i]) { break; }
+                //     i++;
                 // }
-
-                // face3d_face2d_fulldmats.push_back(face2d_fulldmats);
-            }
- 
-            // Create 3FACETO2FACE
-            // std::map<vector<int>, int> face3d_ids_mult;
-            Json::Value face2d_id_to_faces3d_ids;
-            for (std::map<std::string, int>::iterator it = face2d_to_id.begin(); it != face2d_to_id.end(); it++) {
-                std::string key = std::to_string(it->second);
-                std::vector<int> face3d_ids = face2d_mat_to_face3d_ids[it->first];
-                // std::sort(face3d_ids.begin(), face3d_ids.end());
-                // face3d_ids_mult[face3d_ids]++:
-                // if (face3d_ids_mult[face3d_ids] == 1) {
-                Json::Value inner(Json::arrayValue);
-                for (int face3d_id : face3d_ids) {
-                    inner.append(Json::Value(face3d_id));
-                }
-                if (face2d_id_to_faces3d_ids.isMember(key)) {
-                    face2d_id_to_faces3d_ids[key].append(inner);
-                } else {
-                    Json::Value outer(Json::arrayValue);
-                    outer.append(inner);
-                    face2d_id_to_faces3d_ids[key] = outer;
-                }
+                // if (i == uniq_face2d_fulldmats.size()) {
+                //     uniq_face2d_fulldmats.push_back(face2d_fulldmat);
                 // }
             }
-
-            // std::sort(face3d_ids.begin(), face3d_ids.end());
-            // face3d_ids.erase(std::unique(face3d_ids.begin(), face3d_ids.end()), face3d_ids.end());
-            // Json::Value face3d_ids_json(Json::arrayValue);
-            // for (int face3d_id : face3d_ids) { face3d_ids_json.append(Json::Value(face3d_id)); }
 
             // std::sort(face2d_ids.begin(), face2d_ids.end());
-            // face2d_ids.erase(std::unique(face2d_ids.begin(), face2d_ids.end()), face2d_ids.end());
-            // Json::Value face2d_ids_json(Json::arrayValue);
-            // for (int face2d_id : face2d_ids) { face2d_ids_json.append(Json::Value(face2d_id)); }
+            // face2d_ids_mult[face2d_ids]++:
 
-            Json::Value index_doc;
-            index_doc["POLYID"] = Json::Value(poly_id);
-
-            Json::Value out_doc;
-            out_doc["H11"] = Json::Value(h11);
-            out_doc["POLYID"] = Json::Value(poly_id);
-            out_doc["NVERTS"] = Json::Value(nverts);
-
-            if (poly_doc.isMember("NALLTRIANGS")) {
-                int poly_triang = poly_doc["NALLTRIANGS"].asInt();
-                out_doc["NFSRT"] = Json::Value(poly_triang);
+            // if (face2d_ids_mult[face2d_ids] == 1) {
+            std::string key = std::to_string(cone_id);
+            if (face3d_id_to_faces2d_ids.isMember(key)) {
+                face3d_id_to_faces2d_ids[key].append(inner);
+            } else {
+                Json::Value outer(Json::arrayValue);
+                outer.append(inner);
+                face3d_id_to_faces2d_ids[key] = outer;
             }
-            // out_doc["CONEIDS"] = face3d_ids_json;
-            // out_doc["FACEIDS"] = face2d_ids_json;
-            out_doc["CONETOFACE"] = face3d_id_to_faces2d_ids;
-            out_doc["FACETOCONE"] = face2d_id_to_faces3d_ids;
-
-            std::cout << "set POLY ";
-            writer->write(index_doc, &std::cout);
-            std::cout << " ";
-            writer->write(out_doc, &std::cout);
-            std::cout << std::endl;
-
-            // // Remove duplicate 2-faces
-            // for (int i = 0; i < all_face2d_mats.size(); i++) {
-            //     for (int j = i + 1; j < all_face2d_mats.size(); j++) {
-            //         if (all_face2d_mats[i].cols() == all_face2d_mats[j].cols() && all_face2d_mats[i] == all_face2d_mats[j]) {
-            //             all_face2d_mats.erase(all_face2d_mats.begin() + j);
-            //             j--;
-            //         }
-            //     }
             // }
 
-            // double avg = 0;
-            // std::map<std::string, std::vector<int> > face2d_to_face3ds;
-            // for (IntMatrix face2d_fulldmat : uniq_face2d_fulldmats) {
-            //     int count = 0;
-            //     for (int i = 0; i < face3d_face2d_fulldmats.size(); i++) {
-            //         if (face_in_vec(face3d_face2d_fulldmats[i], face2d_fulldmat)) {
-            //             count += LatticePolytope(face3d_mats[i]).p_boundary_points(3).size();
-            //         }
-            //     }
-            //     // cone3d_to_face3d_counts[intmat_to_string(face2d_fulldmat)] = count_face3d;
-            //     avg += (double)count - LatticePolytope(face2d_fulldmat).npoints();
-            //     // std::cout << cone3d_to_face3d_counts[intmat_to_string(face2d_fulldmat)] << std::endl;
-            // }
-
-            // avg /= (double)uniq_face2d_fulldmats.size();
-
-            // std::cout << poly_id << ": " << avg << std::endl;
+            // face3d_face2d_fulldmats.push_back(face2d_fulldmats);
         }
+
+        // Create 3FACETO2FACE
+        // std::map<vector<int>, int> face3d_ids_mult;
+        Json::Value face2d_id_to_faces3d_ids;
+        for (std::map<std::string, int>::iterator it = face2d_to_id.begin(); it != face2d_to_id.end(); it++) {
+            std::string key = std::to_string(it->second);
+            std::vector<int> face3d_ids = face2d_mat_to_face3d_ids[it->first];
+            // std::sort(face3d_ids.begin(), face3d_ids.end());
+            // face3d_ids_mult[face3d_ids]++:
+            // if (face3d_ids_mult[face3d_ids] == 1) {
+            Json::Value inner(Json::arrayValue);
+            for (int face3d_id : face3d_ids) {
+                inner.append(Json::Value(face3d_id));
+            }
+            if (face2d_id_to_faces3d_ids.isMember(key)) {
+                face2d_id_to_faces3d_ids[key].append(inner);
+            } else {
+                Json::Value outer(Json::arrayValue);
+                outer.append(inner);
+                face2d_id_to_faces3d_ids[key] = outer;
+            }
+            // }
+        }
+
+        // std::sort(face3d_ids.begin(), face3d_ids.end());
+        // face3d_ids.erase(std::unique(face3d_ids.begin(), face3d_ids.end()), face3d_ids.end());
+        // Json::Value face3d_ids_json(Json::arrayValue);
+        // for (int face3d_id : face3d_ids) { face3d_ids_json.append(Json::Value(face3d_id)); }
+
+        // std::sort(face2d_ids.begin(), face2d_ids.end());
+        // face2d_ids.erase(std::unique(face2d_ids.begin(), face2d_ids.end()), face2d_ids.end());
+        // Json::Value face2d_ids_json(Json::arrayValue);
+        // for (int face2d_id : face2d_ids) { face2d_ids_json.append(Json::Value(face2d_id)); }
+
+        Json::Value index_doc;
+        index_doc["POLYID"] = Json::Value(poly_id);
+
+        Json::Value out_doc;
+        out_doc["H11"] = Json::Value(h11);
+        out_doc["POLYID"] = Json::Value(poly_id);
+        out_doc["NVERTS"] = Json::Value(nverts);
+
+        if (poly_doc.isMember("NFSRT")) {
+            int poly_triang = poly_doc["NFSRT"].asInt();
+            out_doc["NFSRT"] = Json::Value(poly_triang);
+        }
+        // out_doc["CONEIDS"] = face3d_ids_json;
+        // out_doc["FACEIDS"] = face2d_ids_json;
+        out_doc["CONETOFACE"] = face3d_id_to_faces2d_ids;
+        out_doc["FACETOCONE"] = face2d_id_to_faces3d_ids;
+
+        std::cout << "set POLY ";
+        writer->write(index_doc, &std::cout);
+        std::cout << " ";
+        writer->write(out_doc, &std::cout);
         std::cout << std::endl;
+
+        // // Remove duplicate 2-faces
+        // for (int i = 0; i < all_face2d_mats.size(); i++) {
+        //     for (int j = i + 1; j < all_face2d_mats.size(); j++) {
+        //         if (all_face2d_mats[i].cols() == all_face2d_mats[j].cols() && all_face2d_mats[i] == all_face2d_mats[j]) {
+        //             all_face2d_mats.erase(all_face2d_mats.begin() + j);
+        //             j--;
+        //         }
+        //     }
+        // }
+
+        // double avg = 0;
+        // std::map<std::string, std::vector<int> > face2d_to_face3ds;
+        // for (IntMatrix face2d_fulldmat : uniq_face2d_fulldmats) {
+        //     int count = 0;
+        //     for (int i = 0; i < face3d_face2d_fulldmats.size(); i++) {
+        //         if (face_in_vec(face3d_face2d_fulldmats[i], face2d_fulldmat)) {
+        //             count += LatticePolytope(face3d_mats[i]).p_boundary_points(3).size();
+        //         }
+        //     }
+        //     // cone3d_to_face3d_counts[intmat_to_string(face2d_fulldmat)] = count_face3d;
+        //     avg += (double)count - LatticePolytope(face2d_fulldmat).npoints();
+        //     // std::cout << cone3d_to_face3d_counts[intmat_to_string(face2d_fulldmat)] << std::endl;
+        // }
+
+        // avg /= (double)uniq_face2d_fulldmats.size();
+
+        // std::cout << poly_id << ": " << avg << std::endl;
     }
+    // std::cout << std::endl;
+    // }
 }

@@ -1,0 +1,1 @@
+g++ nfsrt.cpp -o ../nfsrt -std=c++11 $(pkg-config --cflags --libs libmongocxx)

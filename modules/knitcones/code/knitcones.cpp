@@ -4,7 +4,7 @@
 #include <map>
 #include <numeric>
 #include <cmath>
-#include <jon/full/CPPALPv3.h>
+#include <jon/full/CPPALPv2.h>
 // #include <jon/full/jpy.h>
 #include <jon/full/jmongo.h> //includes jsoncpp
 // #include <jon/full/jstring.h>
@@ -214,7 +214,7 @@ int main(int argc, char* argv[]) {
                 diffsq_values.push_back(std::pow(values[i] - mean, 2));
             }
             double diffsq_sum = std::accumulate(diffsq_values.begin(), diffsq_values.end(), 0.0);
-            double stdev = std::sqrt(diffsq_sum / (diffsq_values.size() - 1));
+            double stdev = std::sqrt(diffsq_sum / diffsq_values.size());
             out_doc[key]["MIN"] = min;
             out_doc[key]["MAX"] = max;
             out_doc[key]["MEAN"] = mean;
@@ -234,7 +234,7 @@ int main(int argc, char* argv[]) {
                 diffsq_values.push_back(std::pow(values[i] - mean, 2));
             }
             double diffsq_sum = std::accumulate(diffsq_values.begin(), diffsq_values.end(), 0.0);
-            double stdev = std::sqrt(diffsq_sum / (diffsq_values.size() - 1));
+            double stdev = std::sqrt(diffsq_sum / diffsq_values.size());
             out_doc[key]["MIN"] = min;
             out_doc[key]["MAX"] = max;
             out_doc[key]["MEAN"] = mean;
