@@ -1,1 +1,0 @@
-g++ overcount.cpp -o ../overcount -std=c++11 $(pkg-config --cflags --libs libmongocxx)

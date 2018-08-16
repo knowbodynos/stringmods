@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# Job name
+#SBATCH -J "big_case"
+#################
+# Working directory
+#SBATCH -D "/gss_gpfs_scratch/altman.ro/DBCrunch/modules/modules/overcount"
+#################
+# Job output file
+#SBATCH -o "big_case.info"
+#################
+# Job error file
+#SBATCH -e "big_case.err"
+#################
+# Job file write mode
+#SBATCH --open-mode="truncate"
+#################
+# Job max time
+#SBATCH --time="1-00:00:00"
+#################
+# Partition(s) to use for job
+#SBATCH --partition="ser-par-10g-3"
+#################
+# Number of tasks allocated for each task
+#SBATCH -N 1
+#################
+# List of nodes to distribute n tasks across
+#SBATCH --exclusive
+#################
+# Requeue job on node failure
+#SBATCH --requeue
+#################
+
+# Initialize job steps
+srun -N 1 /gss_gpfs_scratch/altman.ro/DBCrunch/modules/modules/overcount/overcount <<< "{'NVERTS':'{{1,0,0,0},{0,1,0,0},{0,0,1,0},{0,0,0,1},{-42,-28,-12,-1}}','H11':491,'POLYID':473800775}" &
+
+wait
