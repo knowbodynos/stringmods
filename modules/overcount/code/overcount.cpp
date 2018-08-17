@@ -1,4 +1,5 @@
-#include <fstream>
+#include <iostream>
+// #include <fstream>
 #include <string>
 #include <regex>
 #include <map>
@@ -6,9 +7,9 @@
 // #include <jon/full/CPPALPv3.h>
 #include <CPPALP/helpers.h>
 #include <CPPALP/LatticePolytope.h>
-#include <jon/full/jpy.h>
+// #include <jon/full/jpy.h>
 #include <jon/full/jmongo.h> //includes jsoncpp
-#include <jon/full/jstring.h>
+// #include <jon/full/jstring.h>
 
 // bsoncxx and mongocxx includes
 #include <bsoncxx/builder/stream/document.hpp>
@@ -137,19 +138,13 @@ int main(int argc, char* argv[]) {
         int h11 = poly_doc["H11"].asInt();
         int poly_id = poly_doc["POLYID"].asInt();
         std::string nverts = poly_doc["NVERTS"].asString();
-        std::vector<std::vector<int> > poly_verts = string_to_vertex_list(nverts);
 
-        IntMatrix poly_mat(poly_verts[0].size(), poly_verts.size());
-        for (int i = 0; i < poly_verts.size(); i++) {
-            for (int j = 0; j < poly_verts[0].size(); j++) {
-                poly_mat(j, i) = (double) poly_verts[i][j];
-            }
+        IntMatrix poly_mat = string_to_intmat(nverts);
+
+        IntCol origin_col(poly_mat.rows());
+        for (int i = 0; i < poly_mat.rows(); i++) {
+            origin_col(i) = (double) 0;
         }
-
-        IntCol origin_col(poly_verts[0].size());
-            for (int i = 0; i < poly_verts[0].size(); i++) {
-                origin_col(i) = (double) 0;
-            }
         
         LatticePolytope newton_poly = LatticePolytope(poly_mat);
 
@@ -452,8 +447,8 @@ int main(int argc, char* argv[]) {
                 out_doc[key]["STDEV"] = stdev;
             }
 
-            if (poly_doc.isMember("NALLTRIANGS")) {
-                int poly_triang = poly_doc["NALLTRIANGS"].asInt();
+            if (poly_doc.isMember("NFSRT")) {
+                int poly_triang = poly_doc["NFSRT"].asInt();
                 out_doc["NFSRT"] = Json::Value(poly_triang);
             }
 

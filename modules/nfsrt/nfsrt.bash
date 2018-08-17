@@ -9,10 +9,10 @@ do
     if [ "${output}" != "" ]
     then
         echo "${output}"
-        echo ""
     else
     	echo "None"
     fi
+    echo ""
     sleep 0.01
     read line
 done
