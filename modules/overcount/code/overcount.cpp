@@ -225,7 +225,7 @@ int main(int argc, char* argv[]) {
                 if (nfrt_str == "") {
                     ln_nfrt_sum += ln_nfrt_predict;
                 } else {
-                    int ln_nfrt = std::log(std::stod(nfrt_str));
+                    double ln_nfrt = std::log(std::stod(nfrt_str));
                     ln_nfrt_sum += ln_nfrt;
                 }
 
